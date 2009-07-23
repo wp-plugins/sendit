@@ -6,6 +6,8 @@
 function AggiungiEmail() {
     global $_POST;
 	global $wpdb;
+	require_once('class.phpmailer.php');
+	include_once('class.smtp.php');
 	
     $table_email = $wpdb->prefix . "nl_email";
     
@@ -56,52 +58,53 @@ function AggiungiEmail() {
 					$footer= $templaterow->footer;
 					
 					$content_send = $header.$messaggio.$footer;
-				require_once('mailerclass.php');
-				
+					#### Creo object PHPMailer e imposto le COSTANTI SMTP PHPMAILER
+					$mail = new PHPMailer();
+
+					if(get_option('sendit_smtp_host')!='') :	
+					//print_r($mail);
+						$mail->IsSMTP(); // telling the class to use SMTP
+						
+						
+						$mail->Host = get_option('sendit_smtp_host'); // Host
+						$mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
+						$mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
+						
+						if(get_option('sendit_smtp_auth')=='1'):	
+							$mail->SMTPAuth = true;     // turn on SMTP authentication
+							$mail->Username = get_option('sendit_smtp_username');  // SMTP username
+							$mail->Password = get_option('sendit_smtp_password'); // SMTP password
+						else :
+							$mail->SMTPAuth = false;// disable SMTP authentication
+						endif;
+					endif;
 					
-					 /*INTESTAZIONI EMAIL */
-					 $headers =  "MIME-Version: 1.0\n";
-			         $headers .= "From: ".$templaterow->email_lista." <".$templaterow->email_lista.">\n";
-			         $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-					 $headers .= "Content-Transfer-Encoding: 7bit\n\n";
+					$mail->SetFrom($templaterow->email_lista);
+					//$mail->AddReplyTo('pinobulini@gmail.com');
+					$mail->Subject = $welcome;
+					$mail->AltBody = " To view the message, please use an HTML compatible email viewer!";
+					// optional, comment out and test
+					$mail->MsgHTML($content_send);
 					 
 					 $admin_mail_message = __('New subscriber for your newsletter: ', 'sendit'). get_bloginfo('blog_name');		 
-					 $mail_to_admin = new minimail($templaterow->email_lista,$admin_mail_message.get_bloginfo('url').': '.$_POST['email_add'],$_POST['email_add'].__(' subscribe to your mailing list:   ').get_bloginfo('url'), $headers);
 
- //invio con classe a chi si è iscritto con il link x conferma 
-					 $mail_to_user = new minimail($_POST['email_add'], $welcome, $content_send, $headers); 
-
-					 
-
-					
-					//uso la classe
-					 //print ($mail->send()) ? $successo : $errore; 
-					 
-					 if($mail_to_user) : 
-					 
-					 	//echo $successo ; 
+					 $mail->AddAddress($_POST['email_add']);
+					 if($mail->Send()) : 
+						//echo $successo ; 
 					 	die( "document.getElementById('dati').innerHTML = $successo;" );
-
-
-
 					 else : 
 					 	
 					 	//echo $errore; 
 					 	die( "document.getElementById('dati').innerHTML = $errore;" );
-
-
 					 endif;
-					
-					/* invio tradizzionale 
-					 if(mail($_POST['email_add'], "Benvenuto nella Newsletter!", $content_send, $headers)) {
-					 		
-						echo '<div id="message" class="updated fade"><p><strong>Grazie per esserti iscritto alla mia mailing list!</strong></p></div>';
-						
-					 }
-					 
-					 */
-					
-
+					//notifica a admin
+					$mail->ClearAddresses();
+					$mail->AddAddress($templaterow->email_lista);
+					$mail->Subject = $admin_mail_message;
+					$mail->AltBody = __('New subscriber for your newsletter: ', 'sendit').get_bloginfo('blog_name'); 
+					// optional, comment out and test
+					$mail->MsgHTML($_POST['email_add'].__(' subscribe to your mailing list:   ').get_bloginfo('url'));
+					$mail->Send();
 				endif;
 
 			endif;	
