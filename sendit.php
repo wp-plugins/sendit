@@ -67,6 +67,25 @@ thefield.value = ""
 <?php
 } // fine PHP function PushSack + javascript clear field
 
+function SenditSubscribe($id) 
+{
+
+
+		$form_aggiunta="<form name=\"theform\">
+						<p>
+							<input id=\"email_add\" type=\"text\" value=\"\" name=\"email_add\"/>
+							<input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".$id."\">
+							<input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
+				</p>
+					<small>by Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small>
+			</form>
+			
+			<div id=\"dati\"></div>";
+
+		echo $form_aggiunta;
+}
+
+
 
 /*form di iscrizione su the:content */	
 
@@ -356,7 +375,7 @@ function Smtp()
 	</tr>
 	<tr>
 		<th><label for="sendit_smtp_password">SMTP password</label></th>
-		<td><input name="sendit_smtp_password" id="sendit_smtp_password" type="text" value="'.get_option('sendit_smtp_username').'" class="regular-text code" /></td>
+		<td><input name="sendit_smtp_password" id="sendit_smtp_password" type="text" value="'.get_option('sendit_smtp_password').'" class="regular-text code" /></td>
 	</tr>
 
 
@@ -864,22 +883,31 @@ function invianewsletter() {
 		//$mail->AddReplyTo('pinobulini@gmail.com');
 		$mail->Subject = $_POST['oggetto'];
 		$mail->AltBody    = $plain_text." To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-		$mail->MsgHTML($mess);
+
 						
 			
 		
 		
 		foreach ($emails as $email) 
 		{ 
+		//aggiungo messaggio con il link di cancelazione che cicla il magic_string..
+		$deletelink="<center>
+		-------------------------------------------------------------------------------
+		<p>".__('To unsubscribe, please click on the link below', 'sendit')."<br />
+					<a href=\"".$sendit_root."delete.php?action=delete&c=".$email->magic_string."\">".__('Unsubscribe now', 'sendit')."</a></p>
+		</center>";
+			
+			$mail->MsgHTML($mess.$deletelink);
+			
 			$mail->AddAddress($email->email);
 	 		if(!$mail->Send()) {
 				echo '<div id="message" class="error"><p><strong>'.__("Error sending email!", "sendit").' => '. $mail->ErrorInfo.'</strong></p></div>';
 			} else {
-			echo '<div id="message" class="updated fade"><p><strong>'.__("Email sent to".$email->email, "sendit").'</strong></p></div>';
+			echo '<div id="message" class="updated fade"><p><strong>'.__("Email sent to ".$email->email, "sendit").'</strong></p></div>';
 					}	
 			
 			$mail->ClearAddresses();
-
+			$mail->SmtpClose();
 		}
 			
 			//admin notify + report
@@ -888,6 +916,7 @@ function invianewsletter() {
 			$mail->MsgHTML(__('Mail sent to '.count($emails).' subscribers by <a href="http://www.giuseppesurace.com">Sendit</a>'));
 			$mail->Send();
 			$mail->ClearAddresses();
+			$mail->SmtpClose();
 		else :
 		
 
