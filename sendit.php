@@ -884,8 +884,8 @@ function invianewsletter() {
             $mail->Host = get_option('sendit_smtp_host'); // Host
             $mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
             $mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
-            
-            if(get_option('sendit_smtp_auth')=='1'):    
+            //update from 1.4.7 to work with gmail
+            if(get_option('sendit_smtp_auth')!=''):    
                 $mail->SMTPAuth = true;     // turn on SMTP authentication
                 $mail->Username = get_option('sendit_smtp_username');  // SMTP username
                 $mail->Password = get_option('sendit_smtp_password'); // SMTP password
