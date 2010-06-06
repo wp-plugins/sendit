@@ -5,7 +5,7 @@ Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
 import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar
-Version: 1.4.7
+Version: 1.4.8
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -348,9 +348,11 @@ function Smtp()
         update_option('sendit_smtp_host',$_POST['sendit_smtp_host']);
         update_option('sendit_smtp_hostname',$_POST['sendit_smtp_hostname']);
         update_option('sendit_smtp_port',$_POST['sendit_smtp_port']);
+		
         update_option('sendit_smtp_authentication',$_POST['sendit_smtp_authentication']);
         update_option('sendit_smtp_username',$_POST['sendit_smtp_username']);
         update_option('sendit_smtp_password',$_POST['sendit_smtp_password']);
+        update_option('sendit_smtp_ssl',$_POST['sendit_smtp_ssl']);
         
         $markup.='<div id="message" class="updated fade"><p><strong>'.__('Settings saved!', 'sendit').'</strong></p></div>';
     endif;
@@ -383,7 +385,10 @@ function Smtp()
         <th><label for="sendit_smtp_password">SMTP password</label></th>
         <td><input name="sendit_smtp_password" id="sendit_smtp_password" type="text" value="'.get_option('sendit_smtp_password').'" class="regular-text code" /></td>
     </tr>
-
+    <tr>
+        <th><label for="sendit_smtp_ssl">SMTP SSL</label></th>
+        <td><input name="sendit_smtp_ssl" id="sendit_smtp_ssl" type="text" value="'.get_option('sendit_smtp_ssl').'" class="regular-text code" /></td>
+    </tr>
 
 </table>
 
@@ -882,14 +887,20 @@ function invianewsletter() {
             
             
             $mail->Host = get_option('sendit_smtp_host'); // Host
-            $mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
+            //$mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
             $mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
             //update from 1.4.7 to work with gmail
-            if(get_option('sendit_smtp_auth')!=''):    
+            //better in the 1.4.8 gmail bugs fixed!
+			if(get_option('sendit_smtp_username')!=''):    
                 $mail->SMTPAuth = true;     // turn on SMTP authentication
                 $mail->Username = get_option('sendit_smtp_username');  // SMTP username
                 $mail->Password = get_option('sendit_smtp_password'); // SMTP password
-            else :
+            
+			if(get_option('sendit_smtp_ssl')!=''):	
+				$mail->SMTPSecure = get_option('sendit_smtp_ssl'); // SMTP ssl
+			endif;
+			
+			else :
                 $mail->SMTPAuth = false;// disable SMTP authentication
             endif;
         endif;
@@ -1009,10 +1020,18 @@ function invianewsletter() {
 }
 
 
+add_action('admin_head', 'sendit_register_head');
+
+function sendit_register_head() {
+    $siteurl = get_option('siteurl');
+    $url = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/sendit.css';
+    echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
+}
 
 
 /**********PAGINA LISTA ISCRITTI**********/
 function Iscritti() {
+	require('pagination.class.php');
     global $_POST;
     global $wpdb;
     
@@ -1061,14 +1080,14 @@ function Iscritti() {
 
         
             
-            $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$value' and id_lista = '$_POST[lista]' order by email;");
+            $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$value' and id_lista = '$_GET[lista]' order by email;");
             
                 if($user_count>0) :
                     echo "<div class=\"error\"><p><strong>".sprintf(__('email %s already present', 'sendit'), $value)."</strong></p></div>";
                 else :
                 //genero stringa univoca x conferme e cancellazioni sicure
                     $code = md5(uniqid(rand(), true));
-                    $wpdb->query("INSERT INTO $table_email (email,id_lista, magic_string, accepted) VALUES ('$value', '$_POST[lista]', '$code', 'y')");
+                    $wpdb->query("INSERT INTO $table_email (email,id_lista, magic_string, accepted) VALUES ('$value', '$_POST[id_lista]', '$code', 'y')");
                      echo '<div class="updated fade"><p><strong>'.sprintf(__('email %s added succesfully!', 'sendit'), $value).'</strong></p></div>';   
                  endif;    
         endif;
@@ -1083,10 +1102,33 @@ function Iscritti() {
      endif;
 
         
-    
+    $email_items = $wpdb->get_var("SELECT count(*) FROM $table_email where id_lista= '$_GET[lista]'"); // number of total rows in the database
+	if($email_items > 0) {
+		$p = new pagination;
+		$p->items($email_items);
+		$p->limit(10); // Limit entries per page
+		$p->target("admin.php?page=lista-iscritti&lista=".$_GET['lista']);
+		$p->currentPage($_GET[$p->paging]); // Gets and validates the current page
+		$p->calculate(); // Calculates what to show
+		$p->parameterName('paging');
+		$p->adjacents(1); //No. of page away from the current page
+
+		if(!isset($_GET['paging'])) {
+			$p->page = 1;
+		} else {
+			$p->page = $_GET['paging'];
+		}
+
+		//Query for limit paging
+		$limit = "LIMIT " . ($p->page - 1) * $p->limit  . ", " . $p->limit;
+
+	} else {
+		//echo "No Record Found";
+	}
+
    
     
-    $emails = $wpdb->get_results("SELECT id_email, id_lista, email, magic_string, accepted FROM $table_email where id_lista= '$_POST[lista]' order by email");
+    $emails = $wpdb->get_results("SELECT id_email, id_lista, email, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' order by email $limit");
 
     echo "<div class=\"wrap\"><h2>".__('Mailing list management', 'sendit')."</h2>";
     
@@ -1099,41 +1141,49 @@ function Iscritti() {
 
    
    
-    echo "
-    <div class=\"tablenav\">
-    <form id=\"sceglilista\" name=\"sceglilista\" method=\"post\" action=\"\">
-            <label for=\"lista\">".__('Select list', 'sendit')."
-            <select name=\"lista\" onChange=\"document.sceglilista.submit();\" style=\"width:200px;\">";
-            echo "<option>".__('------------', 'sendit')."</option>";
+    echo "<div class=\"table\">
+			<ul>";
+
             foreach ($liste as $lista) {
 
-                if ($_POST['lista']==$lista->id_lista) : $selected=" selected=\"selected\"";  else : $selected=""; endif;     
+                if ($_GET['lista']==$lista->id_lista) : $selected=" class=\"selected\"";  else : $selected=""; endif;     
 
-                echo "<option value=\"".$lista->id_lista."\" ".$selected.">".$lista->nomelista."</option>";
+                echo "<li ".$selected."><a href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\">".$lista->nomelista."</a></li>";
             }
-        echo"</select></label></div>";
+        echo"</ul>
+        </div><hr />";
     
     /*miglioro facendo comparire la form x aggiungere solo se selezionata una lista*/
-    if ($_POST['lista']) :
+    if ($_GET['lista']) :
         
         echo "<h3>".__('Manual Subscribe mailing list ', 'sendit')." ".$_POST['lista']."</h3>
+           <form id=\"add\" name=\"add\" method=\"post\" action=\"admin.php?page=lista-iscritti&lista=".$_GET[lista]."\">
+
         <p>".__('Copy here one or more email address', 'sendit')."</p>
                 <label for=\"email_add\">".__('email address (one or more: default separator= line break)', 'sendit')."<br />
-                
+                <input type=\"hidden\" name=\"id_lista\" value=\"".$_GET[lista]."\" /> 
+               
                 
                 
                 <textarea id=\"emails_add\" type=\"text\" value=\"\" name=\"emails_add\" rows=\"10\" cols=\"50\"/></textarea></label>
                 <input class=\"button\" type=\"submit\" value=\"".__('Add', 'sendit')."\"/>
                 </p>
             </form>";
+        //posiziono la paginazione
+
+		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items."</h3>";
+       if($p):
+			echo $p->show();
+		endif;
+
         
-        echo "<table class=\"form-table\">
-            <tr>
-            <th>".__('Subscribers', 'sendit')." n.".count($emails)."</th>
-            </tr>
+        echo "
+			<div class=\"tablenav\">	
+			<table class=\"form-table\">
     
         ";
         
+      
         foreach ($emails as $email) {
             
             //coloro le input per distinguere tra chi ha confermato e chi no
@@ -1181,7 +1231,8 @@ function Iscritti() {
     
     
     
-    echo "</table>";
+    echo "</table>
+		</div> <!-- end tablenav -->";
     
     endif;    
     

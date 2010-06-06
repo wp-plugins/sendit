@@ -12,7 +12,7 @@ function AggiungiEmail() {
     $table_email = $wpdb->prefix . "nl_email";
     
     //messaggio di successo
-     $successo="'<div id=\"message\" class=\"updated fade\"><p><strong>".__('Thank you for subscribing. You will receive an email shortly with confirmation link!', 'sendit')."</p></div>'";
+     $successo="'<div id=\"message\" class=\"updated fade\"><p><strong>".__('Subscription completed now Check your email and confirm', 'sendit')."</p></div>'";
     //messaggio di errore
     $errore="'<div id=\"message\" class=\"updated fade\"><p><strong>".__('not valid email address', 'sendit')."</strong></p></div>'";
     
@@ -70,10 +70,15 @@ function AggiungiEmail() {
                         $mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
                         $mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
                         
-                        if(get_option('sendit_smtp_auth')=='1'):    
+                        if(get_option('sendit_smtp_username')!=''):    
                             $mail->SMTPAuth = true;     // turn on SMTP authentication
                             $mail->Username = get_option('sendit_smtp_username');  // SMTP username
                             $mail->Password = get_option('sendit_smtp_password'); // SMTP password
+            
+								if(get_option('sendit_smtp_ssl')!=''):	
+									$mail->SMTPSecure = get_option('sendit_smtp_ssl'); // SMTP ssl
+								endif;
+
                         else :
                             $mail->SMTPAuth = false;// disable SMTP authentication
                         endif;
