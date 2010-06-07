@@ -3,8 +3,8 @@ Contributors: Giuseppe Surace
 Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 2.3.0
-Tested up to: 2.9.1
-Stable tag: 1.4.9
+Tested up to: 3.0
+Stable tag: 1.5.0
 
 Sendit is a mailing lists and newsletter management system.
 
@@ -24,6 +24,8 @@ It is the exact same readme.html is included in the zip package.
 1. Upload `sendit dir` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to settings and edit your mailing list or create new one
+4. Setup (if needed) your SMTP favorite settings
+5. Setup (if you have large list) the interval and how many emails to sends
 
 [Sendit Readme](http://www.giuseppesurace.com "Sendit Readme") (Installation Tab)
 
