@@ -4,8 +4,8 @@ Plugin Name: Sendit!
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
-import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar
-Version: 1.4.9
+import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block
+Version: 1.5.0
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -77,7 +77,7 @@ function SenditSubscribe($id)
                             <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".$id."\">
                             <input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
                 </p>
-                    <small>by Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small>
+                    <small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small>
             </form>
             
             <div id=\"dati\"></div>";
@@ -137,7 +137,7 @@ function WidgetForm($args) {
                 <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".get_option('id_lista')."\">
             <input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
             </p>";
-            if (!$dcl_global) $form_aggiunta.="<p><small>Powered by Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small></p>";
+            if (!$dcl_global) $form_aggiunta.="<p><small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small></p>";
             $form_aggiunta.="
         </form><div id=\"dati\"></div></div>".$after_widget;
     
@@ -316,7 +316,7 @@ global $wpdb;
 
     add_submenu_page(__FILE__, __('SMTP settings', 'sendit'), __('SMTP settings', 'sendit'), 8, 'Smtp', 'Smtp');
     
-    add_submenu_page(__FILE__, __('Options', 'sendit'), __('Neswsletter settings', 'sendit'), 8, 'opzioni-newsletter', 'opzioni');
+    add_submenu_page(__FILE__, __('Options', 'sendit'), __('Lists management', 'sendit'), 8, 'opzioni-newsletter', 'opzioni');
     
     add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from comments', 'sendit'), 8, 'mass-import', 'Importazioni');
 
@@ -354,6 +354,12 @@ function Smtp()
         update_option('sendit_smtp_password',$_POST['sendit_smtp_password']);
         update_option('sendit_smtp_ssl',$_POST['sendit_smtp_ssl']);
         
+        //new from 1.5.0!!!
+        update_option('sendit_sleep_time',$_POST['sendit_sleep_time']);
+        update_option('sendit_sleep_each',$_POST['sendit_sleep_each']);
+        
+
+        
         $markup.='<div id="message" class="updated fade"><p><strong>'.__('Settings saved!', 'sendit').'</strong></p></div>';
     endif;
     $markup.='<h3>'.__('Smtp settings are required only if you want to send mail using an SMTP server','sendit').'</h3>
@@ -364,17 +370,14 @@ function Smtp()
         <th><label for="sendit_smtp_host">SMTP host</label></th>
         <td><input name="sendit_smtp_host" id="sendit_smtp_host" type="text" value="'.get_option('sendit_smtp_host').'" class="regular-text code" /></td>
     </tr>
-    <tr>
-        <th><label for="sendit_smtp_hostname">SMTP hostname</label></th>
-        <td><input name="sendit_smtp_hostname" id="sendit_smtp_hostname" type="text" value="'.get_option('sendit_smtp_hostname').'" class="regular-text code" /></td>
-    </tr>
+
     <tr>
         <th><label for="sendit_smtp_port">SMTP port</label></th>
         <td><input name="sendit_smtp_port" id="sendit_smtp_hostname" type="text" value="'.get_option('sendit_smtp_port').'" class="regular-text code" /></td>
     </tr>
     <tr>
         <th colspan="2">
-        <h3>'.__('Settings below are required only if SMTP server require authentication').'</h3>
+        <h3>'.__('Settings below are required only if SMTP server require authentication','sendit').'</h3>
         </th>
     </tr>    
     <tr>
@@ -387,7 +390,54 @@ function Smtp()
     </tr>
     <tr>
         <th><label for="sendit_smtp_ssl">SMTP SSL</label></th>
-        <td><input name="sendit_smtp_ssl" id="sendit_smtp_ssl" type="text" value="'.get_option('sendit_smtp_ssl').'" class="regular-text code" /></td>
+        <td>
+        	<select name="sendit_smtp_ssl" id="sendit_smtp_ssl">
+        		<option value="'.get_option('sendit_smtp_ssl').'" selected="selected" />'.get_option('sendit_smtp_ssl').'</option>
+        		<option value="">no</option>
+        		<option value="ssl">SSL</option>
+        		<option value="tls">TLS</option>
+		</select>
+        </td>
+    </tr>
+	<tr>
+        <th colspan="2">
+        <h3>'.__('These settings are useful if you want to send email blocks and stop for some seconds','sendit').'</h3>
+        </th>
+    </tr> 
+        <tr>
+        <th><label for="sendit_sleep_time">Usleep interval (seconds)</label></th>
+        <td><select name="sendit_sleep_time" id="sendit_sleep_time">
+        		<option value="'.get_option('sendit_sleep_time').'" selected="selected" />'.substr(get_option('sendit_sleep_time'),0,2).'</option>
+        		<option value="0">0</option>
+        		<option value="10000000">10</option>
+        		<option value="20000000">20</option>
+        		<option value="30000000">30</option>
+        		<option value="40000000">40</option>
+		</select>
+        		
+        </td>
+    </tr>
+
+
+        <tr>
+        <th><label for="sendit_sleep_each">each (email sent)</label></th>
+        <td>
+        <select name="sendit_sleep_each" id="sendit_sleep_each">
+        		<option value="'.get_option('sendit_sleep_each').'" selected="selected" />'.get_option('sendit_sleep_each').'</option>
+        		<option value="0">0</option>
+        		<option value="10">10</option>
+        		<option value="20">20</option>
+        		<option value="30">30</option>
+        		<option value="40">40</option>
+        		<option value="50">50</option>
+        		<option value="60">60</option>
+        		<option value="70">70</option>
+        		<option value="80">80</option>
+        		<option value="90">90</option>
+        		<option value="100">100</option>
+		</select>
+        		
+        </td>
     </tr>
 
 </table>
@@ -906,16 +956,16 @@ function invianewsletter() {
         endif;
         
         $mail->SetFrom($templaterow->email_lista);
-        //$mail->AddReplyTo('pinobulini@gmail.com');
         $mail->Subject = $_POST['oggetto'];
         $mail->AltBody    = $plain_text." To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
 
                         
             
         
-        
+        $i=0;
         foreach ($emails as $email)
         {
+       	$i++;
         //aggiungo messaggio con il link di cancelazione che cicla il magic_string..
         $deletelink="<center>
         -------------------------------------------------------------------------------
@@ -926,15 +976,32 @@ function invianewsletter() {
             $mail->MsgHTML($mess.$deletelink);
             
             $mail->AddAddress($email->email);
+            
+            //if(1!=1) {
              if(!$mail->Send()) {
-                echo '<div id="message" class="error"><p><strong>'.__("Error sending email!", "sendit").' => '. $mail->ErrorInfo.'</strong></p></div>';
+                echo '<div id="message" class="error"><p><strong>'.__($i." Error sending email!", "sendit").' => '. $mail->ErrorInfo.'</strong></p></div>';
             } else {
-            echo '<div id="message" class="updated fade"><p><strong>'.__("Email sent to ".$email->email, "sendit").'</strong></p></div>';
+            echo '<div id="message" class="updated fade"><p><strong>'.__($i." Email sent to ".$email->email, "sendit").'</strong></p></div>';
                     }    
             
             $mail->ClearAddresses();
-            $mail->SmtpClose();
-        }
+            //$mail->SmtpClose();
+            
+            //break di 30 secondi ogni 10 email provamoce...
+			if(get_option('sendit_sleep_time')!='0')
+			{
+			
+            	if (($i % get_option('sendit_sleep_each')) == 0 && $i!=0)
+            	{
+            	echo '<div id="message" class="error"><p><strong>'.sprintf(__('Sendit will restart to send newsletters in %s seconds', 'sendit'), get_option('sendit_sleep_time')).'</strong></p></div>';
+
+            		usleep(get_option('sendit_sleep_time'));
+             	}
+            
+            }
+     	
+            	
+        } //endforeach
             
             //admin notify + report
             $mail->AddAddress($templaterow->email_lista);
@@ -1106,7 +1173,7 @@ function Iscritti() {
 	if($email_items > 0) {
 		$p = new pagination;
 		$p->items($email_items);
-		$p->limit(10); // Limit entries per page
+		$p->limit(20); // Limit entries per page
 		$p->target("admin.php?page=lista-iscritti&lista=".$_GET['lista']);
 		$p->currentPage($_GET[$p->paging]); // Gets and validates the current page
 		$p->calculate(); // Calculates what to show
@@ -1129,6 +1196,8 @@ function Iscritti() {
    
     
     $emails = $wpdb->get_results("SELECT id_email, id_lista, email, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' order by email $limit");
+    //email confermat
+    $emails_confirmed = $wpdb->get_results("SELECT id_email, id_lista, email, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' and accepted='y'");
 
     echo "<div class=\"wrap\"><h2>".__('Mailing list management', 'sendit')."</h2>";
     
@@ -1171,14 +1240,14 @@ function Iscritti() {
             </form>";
         //posiziono la paginazione
 
-		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items."</h3>";
+		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items." (".__('Subscriptions confirmed', 'sendit').": ".count($emails_confirmed).")</h3>";
        if($p):
 			echo $p->show();
 		endif;
 
         
         echo "
-			<div class=\"tablenav\">	
+			
 			<table class=\"form-table\">
     
         ";
@@ -1231,13 +1300,17 @@ function Iscritti() {
     
     
     
-    echo "</table>
-		</div> <!-- end tablenav -->";
+    echo "</table>";
+    echo '<hr />';
+    //ripeto la paginazione
+    if($p):
+			echo $p->show();
+	endif;
     
     endif;    
     
     echo "</div>";
+  
     
 }
-
 ?>
