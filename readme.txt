@@ -4,7 +4,7 @@ Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 2.3.0
 Tested up to: 3.0
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 
 Sendit is a mailing lists and newsletter management system.
 
