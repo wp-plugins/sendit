@@ -2,10 +2,10 @@
 /*
 Plugin Name: Sendit!
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
-Description: Send your post to your subscribers with Sendit, an italian plugin that allows you to
+Description: Checkout new Sendit Pro cooming soon http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
 import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1)
-Version: 1.5.2
+Version: 1.5.3
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -16,7 +16,9 @@ add_action('wp_head', 'Pushsack');
 add_action('admin_menu', 'gestisci_menu');
 add_action('plugins_loaded','DisplayForm');
 add_action('admin_head', 'Pusheditor');
-load_plugin_textdomain('sendit', PLUGINDIR.'/languages/'.dirname(plugin_basename(__FILE__)));
+
+load_plugin_textdomain('sendit', false, basename(dirname(__FILE__)) . '/languages'); //thanks to Davide http://www.jqueryitalia.org
+
 
 $sendit_directory   = "sendit/";
 $sendit_root = get_option('siteurl') . '/wp-content/plugins/'.$sendit_directory;
@@ -881,7 +883,13 @@ function invianewsletter() {
  
       
      echo "<div class=\"wrap\"><h2>".__('Send Newsletter', 'sendit')."</h2>";
-	 echo '<div style="background:#f9f9f9; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;"<p>'.__('Sendit needs support! Make a donation NOW!<br />
+	 echo '<div style="color: #D8000C; background-color: #FFBABA; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;">
+			<h2>'.__('Large mailing list? Be Careful for spam!').'</h2>
+			<p>'.__('Be careful before to send newsletters to large list, check out the  Sendit Add Ons PRO to scheduler + newsletter tracker system! It will be available on September for a small fee (15/20 &euro;)').'</p>
+			<p>'.__('Subscribe the mailing list on my new official Sendit Website and stay updated when Sendit PRO will be ready <a href="http://sendit.wordpressplanet.org/sendit-pro/">Sendit Pro</a>').'</p>
+
+			</div>';
+	 echo '<div style="background:#f9f9f9; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;"><p>'.__('Sendit needs support! Make a donation NOW!<br />
 	new version with new features is coming: cron-jobs / batch and queue emails / new user interface!','sendit').'
 	            </p><form name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 	<input name="cmd" value="_xclick" type="hidden">
