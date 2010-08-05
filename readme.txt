@@ -4,7 +4,7 @@ Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 2.3.0
 Tested up to: 3.0
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 
 Sendit is a mailing lists and newsletter management system.
 
@@ -18,6 +18,8 @@ It is the exact same readme.html is included in the zip package.
 == Development Blog ==
 
 [Giuseppe Surace WP development blog](http://www.giuseppesurace.com "Italian Wp designer and plugin developer")
+[Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress Plugin")
+
 
 == Installation ==
 
