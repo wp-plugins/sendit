@@ -5,7 +5,7 @@ Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: Checkout new Sendit Pro cooming soon http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
 import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1)
-Version: 1.5.3
+Version: 1.5.4
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -329,6 +329,11 @@ global $wpdb;
 if ($wpdb->get_var("show tables like 'bb_press'") != '') :
  add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from BBpress', 'sendit'), 8, 'import-bb-users', 'ImportBbPress');
 endif;
+
+if (function_exists('sendit_check')) {
+    add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'cron_settings');
+}
+
     
     
 
@@ -867,28 +872,41 @@ function ImportBbPress() {
 
 
 
-
-
-
-
-
 /*
- * INVIO NEWSLETTER#########################################
+ * INVIO NEWSLETTER######################################### rifatta rimuovendo phpmailer e utilizzando wp_mail
  */
 function invianewsletter() {
-    require_once('class.phpmailer.php');
-    include_once('class.smtp.php');
+
     global $_POST;
     global $wpdb;
  
       
      echo "<div class=\"wrap\"><h2>".__('Send Newsletter', 'sendit')."</h2>";
-	 echo '<div style="color: #D8000C; background-color: #FFBABA; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;">
-			<h2>'.__('Large mailing list? Be Careful for spam!').'</h2>
-			<p>'.__('Be careful before to send newsletters to large list, check out the  Sendit Add Ons PRO to scheduler + newsletter tracker system! It will be available on September for a small fee (15/20 &euro;)').'</p>
-			<p>'.__('Subscribe the mailing list on my new official Sendit Website and stay updated when Sendit PRO will be ready <a href="http://sendit.wordpressplanet.org/sendit-pro/">Sendit Pro</a>').'</p>
+	
+	if(function_exists('sendit_check'))
+	{
+		 echo '<div style="color: #D8000C; background-color: #c9f5cc; margin:10px 0 20px 0; border:1px solid #75cc83; padding:5px;">
+				<h2>'.__('Warning').'</h2>
+				<p>'.__('You already buy Sendit Pro to send and schedule newsletter please use the <a href="'.get_bloginfo('url').'/wp-admin/edit.php?post_type=newsletter">new panel</a>').'</p>
+				<p>'.__('Subscribe the mailing list on my new official Sendit Website and stay updated when Sendit PRO will be ready <a href="http://sendit.wordpressplanet.org/sendit-pro/">Sendit Pro</a>').'</p>
 
-			</div>';
+				</div>';
+
+	} 
+	else 
+	{
+
+		echo '<div style="color: #D8000C; background-color: #FFBABA; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;">
+				<h2>'.__('Large mailing list? Be Careful for spam!').'</h2>
+				<p>'.__('Be careful before to send newsletters to large list, check out the  Sendit Add Ons PRO to scheduler + newsletter tracker system! It will be available on September for a small fee (15/20 &euro;)').'</p>
+				<p>'.__('Subscribe the mailing list on my new official Sendit Website and stay updated when Sendit PRO will be ready <a href="http://sendit.wordpressplanet.org/sendit-pro/">Sendit Pro</a>').'</p>
+
+				</div>';
+
+
+	}
+			
+	
 	 echo '<div style="background:#f9f9f9; margin:10px 0 20px 0; border:1px solid #ffcc00; padding:5px;"><p>'.__('Sendit needs support! Make a donation NOW!<br />
 	new version with new features is coming: cron-jobs / batch and queue emails / new user interface!','sendit').'
 	            </p><form name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post">
@@ -936,38 +954,14 @@ function invianewsletter() {
         $footer= $templaterow->footer;
         $mess=$header.$messaggio.$footer;
 
-        #### Creo object PHPMailer e imposto le COSTANTI SMTP PHPMAILER
-        $mail = new PHPMailer();
-        
-        if(get_option('sendit_smtp_host')!='') :    
-        //print_r($mail);
-            $mail->IsSMTP(); // telling the class to use SMTP
-            
-            
-            $mail->Host = get_option('sendit_smtp_host'); // Host
-            //$mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
-            $mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
-            //update from 1.4.7 to work with gmail
-            //better in the 1.4.8 gmail bugs fixed!
-			if(get_option('sendit_smtp_username')!=''):    
-                $mail->SMTPAuth = true;     // turn on SMTP authentication
-                $mail->Username = get_option('sendit_smtp_username');  // SMTP username
-                $mail->Password = get_option('sendit_smtp_password'); // SMTP password
-            
-			if(get_option('sendit_smtp_ssl')!=''):	
-				$mail->SMTPSecure = get_option('sendit_smtp_ssl'); // SMTP ssl
-			endif;
-			
-			else :
-                $mail->SMTPAuth = false;// disable SMTP authentication
-            endif;
-        endif;
-        
-        $mail->SetFrom($templaterow->email_lista);
-        $mail->Subject = $_POST['oggetto'];
-        $mail->AltBody    = $plain_text." To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
+        $from=$templaterow->email_lista;
+        $subject = $_POST['oggetto'];
+        $AltBody= $plain_text." To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
 
-                        
+        $headers= "MIME-Version: 1.0\n" .
+		        "From: ".$from." <".$from.">\n" .
+		        "Content-Type: text/html; charset=\"" .
+		get_option('blog_charset') . "\"\n";                
             
         
         $i=0;
@@ -981,19 +975,18 @@ function invianewsletter() {
                     <a href=\"".$sendit_root."delete.php?action=delete&c=".$email->magic_string."\">".__('Unsubscribe now', 'sendit')."</a></p>
         </center>";
             
-            $mail->MsgHTML($mess.$deletelink);
+            $message=$mess.$deletelink;
             
-            $mail->AddAddress($email->email);
+            $recipient=$email->email;
             
             //if(1!=1) {
-             if(!$mail->Send()) {
+             if(!wp_mail($recipient, $subject ,$message, $headers, $attachments)) {
                 echo '<div id="message" class="error"><p><strong>'.__($i." Error sending email!", "sendit").' => '. $mail->ErrorInfo.'</strong></p></div>';
             } else {
             echo '<div id="message" class="updated fade"><p><strong>'.__($i." Email sent to ".$email->email, "sendit").'</strong></p></div>';
                     }    
             
-            $mail->ClearAddresses();
-            //$mail->SmtpClose();
+
             
             //break di 30 secondi ogni 10 email provamoce...
 			if(get_option('sendit_sleep_time')!='0')
@@ -1012,12 +1005,15 @@ function invianewsletter() {
         } //endforeach
             
             //admin notify + report
-            $mail->AddAddress($templaterow->email_lista);
+/*           
+ $mail->AddAddress($templaterow->email_lista);
             $mail->Subject = __('Newsletter report: '.time(),'sendit');
             $mail->MsgHTML(__('Mail sent to '.count($emails).' subscribers by <a href="http://www.giuseppesurace.com">Sendit</a>'));
             $mail->Send();
             $mail->ClearAddresses();
-            $mail->SmtpClose();
+ 
+           $mail->SmtpClose();
+*/
         else :
         
 
@@ -1093,6 +1089,42 @@ function invianewsletter() {
             echo "</div>";
 
 }
+
+
+
+add_action('phpmailer_init','phpmailer_init_smtp');
+
+
+if (!function_exists('phpmailer_init_smtp')) {
+	
+	// This code is copied, from wp-includes/pluggable.php as at version 2.2.2
+	function phpmailer_init_smtp($phpmailer) {
+
+
+		
+		// Set the mailer type as per config above, this overrides the already called isMail method
+		if(get_option('sendit_smtp_host')!='') {
+			$phpmailer->Mailer = 'smtp';			
+			// If we're sending via SMTP, set the host
+			$phpmailer->Host = get_option('sendit_smtp_host');
+			// If we're using smtp auth, set the username & password SO WE USE AUTH
+			if (get_option('sendit_smtp_username')!='') {
+				$phpmailer->SMTPAuth = TRUE;
+				$phpmailer->Username = get_option('sendit_smtp_username');
+				$phpmailer->Password = get_option('sendit_smtp_password');
+			}
+		}
+		
+		// You can add your own options here, see the phpmailer documentation for more info:
+		// http://phpmailer.sourceforge.net/docs/
+		
+		// Stop adding options here.
+		
+	} // End of phpmailer_init_smtp() function definition
+	
+}
+
+
 
 
 add_action('admin_head', 'sendit_register_head');
