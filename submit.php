@@ -18,7 +18,7 @@ function AggiungiEmail() {
     
     if(isset($_POST['email_add'])):   
     
-    if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $_POST['email_add'])) :
+    if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $_POST['email_add'])) :
        
                die( "document.getElementById('dati').innerHTML = $errore;" );
 
