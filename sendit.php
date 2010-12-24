@@ -5,11 +5,10 @@ Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: For professional use buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
 import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1)
-Version: 1.5.5
+Version: 1.5.6
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
-
 
 register_activation_hook(__FILE__,'Sendit_install');
 add_action('wp_head', 'Pushsack');
@@ -30,33 +29,25 @@ add_filter('the_content', 'GeneraForm');
 function Pushsack() // Spingo ajax su header
 {
   // uso JavaScript SACK library per Ajax
-  wp_print_scripts( array( 'sack' ));
+  wp_print_scripts( array('jquery' ));
 
   // Define custom JavaScript function
 ?>
 <script type="text/javascript">
-//<![CDATA[
-function Ajax(email_add, lista, results_div)
-{
-    
-    var mysack = new sack(
-       "<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/submit.php" );    
+jQuery(document).ready(function(){
+	jQuery('#sendit_subscribe_button').click(function(){
+		jQuery.ajax({
+		type: "POST",
+      	data: ({email_add : $('#email_add').val(),lista : $('#lista').val()}),  		
+      	url: '<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/submit.php',
+  		success: function(data) {
+    	jQuery('#dati').html(data);
+    /*alert(data);*/
+  }
+});
+	});
+});
 
-  mysack.execute = 1;
-  mysack.method = 'POST';
-  mysack.setVar( "email_add", email_add );
-  mysack.setVar( "lista", lista );
-  mysack.setVar( "results_div_id", results_div );
-  mysack.onError = function() { alert('Ajax error in voting' )};
-  mysack.runAJAX();
-
-  return true;
-
-    
-    
-    
-} // fine JavaScript function ajax SACK
-//]]>
 </script>
 
 <script type="text/javascript">
@@ -77,7 +68,7 @@ function SenditSubscribe($id)
                         <p>
                             <input id=\"email_add\" type=\"text\" value=\"\" name=\"email_add\"/>
                             <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".$id."\">
-                            <input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
+                            <input class=\"button\" type=\"button\" id=\"sendit_subscribe_button\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
                 </p>
                     <small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small>
             </form>
@@ -106,9 +97,9 @@ if (stristr($text, '[newsletter' ))
                 <p>
                 <input id=\"email_add\" type=\"text\" value=\"\" name=\"email_add\"/>
                     <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".$match[1]."\">
-                <input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
+                <input class=\"button\" type=\"button\" id=\"agg_email\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
                 </p>
-                    <small>by Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small>
+                    <small>Sendit <a href=\"http://www.giuseppesurace.com\" title=\"Wordpress newsletter plugin\">Wordpress newsletter</a></small>
             </form>
             
             <div id=\"dati\"></div>";
@@ -140,6 +131,26 @@ function WidgetForm($args) {
             <input class=\"button\" type=\"button\" onclick=\"javascript:Ajax(this.form.email_add.value, this.form.lista.value,'dati');\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
             </p>";
             if (!$dcl_global) $form_aggiunta.="<p><small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress newsletter</a></small></p>";
+            $form_aggiunta.="
+        </form><div id=\"dati\"></div></div>".$after_widget;
+    
+    echo $form_aggiunta;
+}
+
+function JqueryForm($args) {
+    global $dcl_global;
+    extract($args);
+    //before_widget,before_title,after_title,after_widget
+
+    $form_aggiunta=$before_widget."
+             ".$before_title.get_option('titolo').$after_title."
+            <div class=\"sendit\">
+            <form name=\"theform\">
+            <input id=\"email_add\" type=\"text\" value=\"email\" name=\"email_add\" onFocus=\"clearText(this)\"/>
+                <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".get_option('id_lista')."\">
+            <input class=\"button\" type=\"button\" id=\"sendit_subscribe_button\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
+            </p>";
+            if (!$dcl_global) $form_aggiunta.="<p><small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress  newsletter</a></small></p>";
             $form_aggiunta.="
         </form><div id=\"dati\"></div></div>".$after_widget;
     
@@ -183,7 +194,7 @@ function DisplayForm()
         return;
     }
 
-    register_sidebar_widget('Sendit Widget','WidgetForm');
+    register_sidebar_widget('Sendit Widget','JqueryForm');
     register_widget_control('Sendit Widget','Sendit_widget_options', 200, 200);
     
 }
@@ -332,6 +343,12 @@ endif;
 
 if (function_exists('sendit_check')) {
     add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'cron_settings');
+}
+
+/*1.5.6 export addon*/
+if (function_exists('sendit_check')) 
+{
+	add_submenu_page(__FILE__, __('Export list', 'sendit'), __('Export list', 'sendit'), 8, 'export-subscribers', 'export_subscribers');
 }
 
     
@@ -1178,8 +1195,8 @@ function Iscritti() {
       
       //echo $value."<br />";
         
-    
-      if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", trim($value))) :
+	//validation fix 1.5.6 (also there!) {2,4}    
+      if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", trim($value))) :
        
                echo '<div id="message" class="error"><p><strong>indirizzo email '.$value.' non valido!</strong></p></div>';
 
@@ -1251,33 +1268,58 @@ function Iscritti() {
    
    
     echo "<div class=\"table\">
-			<ul>";
+			<table class=\"widefat  fixed\">
+				<thead>
+					<tr>
+						<th>".__('id', 'sendit')."</th>
+						<th class=".$css_list.">".__('mailing list', 'sendit')."</th>
+						<th>".__('actions', 'sendit')."</th>
+
+					</tr>
+				</thead>";
 
             foreach ($liste as $lista) {
 
-                if ($_GET['lista']==$lista->id_lista) : $selected=" class=\"selected\"";  else : $selected=""; endif;     
+                if ($_GET['lista']==$lista->id_lista) : $selected=" class=\"updated fade\"";  else : $selected=""; endif;     
 
-                echo "<li ".$selected."><a href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\">".$lista->nomelista."</a></li>";
+                echo "<tr >
+                		<td>".$lista->id_lista."</td>
+                		<td ".$selected."><a class=\"\" href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\">".$lista->nomelista."</a></td>
+                		<td></td><tr>";
             }
-        echo"</ul>
-        </div><hr />";
+        echo"</table>
+        </div><br clear=\"all\ />";
     
     /*miglioro facendo comparire la form x aggiungere solo se selezionata una lista*/
     if ($_GET['lista']) :
         
         echo "<h3>".__('Manual Subscribe mailing list ', 'sendit')." ".$_POST['lista']."</h3>
-           <form id=\"add\" name=\"add\" method=\"post\" action=\"admin.php?page=lista-iscritti&lista=".$_GET[lista]."\">
 
-        <p>".__('Copy here one or more email address', 'sendit')."</p>
                 <label for=\"email_add\">".__('email address (one or more: default separator= line break)', 'sendit')."<br />
-                <input type=\"hidden\" name=\"id_lista\" value=\"".$_GET[lista]."\" /> 
-               
-                
+               <div id=\"dashboard-widgets\" class=\"metabox-holder\">
+               <div class='postbox-container' style='width:49%;'>
+				<div id=\"normal-sortables\" class=\"meta-box-sortables\">
+				<div id=\"dashboard_right_now\" class=\"postbox \" >
+					<div class=\"handlediv\" title=\"Fare clic per cambiare.\"><br /></div>
+				<h3 class='hndle'><span>".__('Subscription','sendit')."</span></h3>
+				<div class=\"inside\">
+				        <p>".__('Copy here one or more email address', 'sendit')."</p>
+
+					           <form id=\"add\" name=\"add\" method=\"post\" action=\"admin.php?page=lista-iscritti&lista=".$_GET[lista]."\">
+
                 
                 <textarea id=\"emails_add\" type=\"text\" value=\"\" name=\"emails_add\" rows=\"10\" cols=\"50\"/></textarea></label>
+                 <input type=\"hidden\" name=\"id_lista\" value=\"".$_GET[lista]."\" /> 
+
                 <input class=\"button\" type=\"submit\" value=\"".__('Add', 'sendit')."\"/>
                 </p>
-            </form>";
+                            </form>
+                </div>
+               </div>
+               </div>
+               </div>
+               </div>
+               <br clear=\"all\" />";
         //posiziono la paginazione
 
 		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items." (".__('Subscriptions confirmed', 'sendit').": ".count($emails_confirmed).")</h3>";
@@ -1287,9 +1329,17 @@ function Iscritti() {
 
         
         echo "
-			
-			<table class=\"form-table\">
-    
+        <br clear=\"all\" />
+			<table class=\"widefat post fixed\">
+				<thead>
+					<tr>
+						<th>".__('email', 'sendit')."</th>
+						<th>".__('status', 'sendit')."</th>
+						<th>".__('actions', 'sendit')."</th>
+
+					</tr>
+				</thead>
+    	
         ";
         
       
@@ -1301,15 +1351,18 @@ function Iscritti() {
             else { $style="style=\"background:#fd919b; border:1px solid #EF4A5C;\""; }
                     
                 
-        echo "<tr>
-                <td  ".$style." >
-                    <form action=\"\" method=\"post\">
+        echo "<tr>	
+        		<form action=\"#email_".$email->id_email."\" method=\"post\">
+
+                <td id=\"email_".$email->id_email."\">
+                   
+                        <!--input type=\"checkbox\" name=\"email_handler[]\" value=\"".$email->id_email."\">-->
                         <input type=\"hidden\" name=\"id_email\" value=\"".$email->id_email."\">
                         <input type=\"hidden\" name=\"lista\" value=\"".$_POST['lista']."\">
-                        <label for=\"email\">".__('email', 'sendit')."
                         <input type='hidden' name='code' value='".$email->magic_string."' />
-                        <input type='text' name='email' value='".$email->email."' /></label> |
-                        
+                        <input type='text' name='email' value='".$email->email."' />
+                        </td>
+                        <td   ".$style." >
                         <select name=\"status\">
                             
                             <option value=\"y\"";
@@ -1327,21 +1380,28 @@ function Iscritti() {
                             echo">".__('Cancelled', 'sendit')."</option>
                             
                         </select>
-                        
-                        <input type=\"submit\" name=\"update\" value=\"".__('Update', 'sendit')."\">
-
-                        <input type=\"submit\" name=\"delete\" value=\"".__('Delete', 'sendit')."\">
-                    </form>
-                </td>
-            </tr>";
+                        </td>
+                        <td>
+	                        <input type=\"submit\" class=\"button\" name=\"update\" value=\"".__('Update', 'sendit')."\">
+	                        <input type=\"submit\" class=\"button\" name=\"delete\" value=\"".__('Delete', 'sendit')."\">
+						</td>
+            </form>
+            </tr>    ";
             
         
         }
     
     
     
-    echo "</table>";
-    echo '<hr />';
+    echo "				<thead>
+					<tr>
+						<th>".__('email', 'sendit')."</th>
+						<th>".__('status', 'sendit')."</th>
+						<th>".__('actions', 'sendit')."</th>
+
+					</tr>
+				</thead>
+</table><br clear=\"all\" />";
     //ripeto la paginazione
     if($p):
 			echo $p->show();
@@ -1353,4 +1413,52 @@ function Iscritti() {
   
     
 }
+
+function export_subscribers() {
+	global $wpdb;
+	 $table_liste =  $wpdb->prefix . "nl_liste";   
+     $liste = $wpdb->get_results("SELECT id_lista, nomelista FROM $table_liste ");
+	 $export_url = get_option('siteurl') . '/wp-content/plugins/sendit/export.php';        
+
+?>
+<div class="wrap">
+
+<h2><?php echo __('Export list subscribers','sendit');?></h2>
+<p><?php echo __('This will generate a CSV file based on your export settings. The CSV file will be contain only email addresses. To import in other Sendit installation just paste the generated CSV into manage subscribers area'); ?></p>
+<form method="post" action="<?php echo $export_url; ?>">
+    <?php settings_fields( 'baw-settings-group' ); ?>
+    <table class="form-table">
+        <tr valign="top">
+        <th scope="row">Select list</th>
+        	<td><select name="list_id">
+        		<option value="all"><?php echo __('All lists subscribers', 'sendit');?></option>
+				<?php
+	                foreach ($liste as $lista) {
+                    
+                    echo "<option value=".$lista->id_lista.">".$lista->nomelista."</option>";
+                    
+                } ?>
+                 </select>
+        	</td>
+        </tr>
+         
+        <tr valign="top">
+        <th scope="row">Status</th>
+        <td>
+        	<select name="status">
+        		<option value="y"><?php echo __('only Confirmed subscribers', 'sendit')?></option>
+        		<option value="0"><?php echo __('All subscribers', 'sendit')?></option>
+        	</select>
+        </td>
+        </tr>
+        
+    </table>
+    
+    <p class="submit">
+    <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+    </p>
+
+</form>
+</div>
+<?php }
 ?>

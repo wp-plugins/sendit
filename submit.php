@@ -6,21 +6,20 @@
 function AggiungiEmail() {
     global $_POST;
     global $wpdb;
-    require_once('class.phpmailer.php');
-    include_once('class.smtp.php');
+
     
     $table_email = $wpdb->prefix . "nl_email";
     
     //messaggio di successo
-     $successo="'<div id=\"message\" class=\"updated fade\"><p><strong>".__('Subscription completed now Check your email and confirm', 'sendit')."</p></div>'";
+     $successo="<div id=\"message\" class=\"updated fade\"><p><strong>".__('Subscription completed now Check your email and confirm', 'sendit')."</p></div>";
     //messaggio di errore
-    $errore="'<div id=\"message\" class=\"updated fade\"><p><strong>".__('not valid email address', 'sendit')."</strong></p></div>'";
+    $errore="<div id=\"message\" class=\"updated fade\"><p><strong>".__('not valid email address', 'sendit')."</strong></p></div>";
     
     if(isset($_POST['email_add'])):   
     
     if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $_POST['email_add'])) :
        
-               die( "document.getElementById('dati').innerHTML = $errore;" );
+               die($errore); 
 
       else :
 
@@ -28,8 +27,8 @@ function AggiungiEmail() {
         $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$_POST[email_add]' and id_lista = '$_POST[lista]';");
         
             if($user_count>0) :
-                $errore_presente = "'<div class=\"error\">".__('email address already present', 'sendit')."</div>'";
-                die( "document.getElementById('dati').innerHTML = $errore_presente;" );
+                $errore_presente = "<div class=\"error\">".__('email address already present', 'sendit')."</div>";
+                die($errore_presente);
             else :
             
                 //genero stringa univoca x conferme sicure
@@ -41,13 +40,19 @@ function AggiungiEmail() {
                 
                 $table_liste = $wpdb->prefix . "nl_liste";
                 
-                     $templaterow=$wpdb->get_row("SELECT * from $table_liste where id_lista = '$_POST[lista]' ");
+                    $templaterow=$wpdb->get_row("SELECT * from $table_liste where id_lista = '$_POST[lista]' ");
                     //costruisco il messaggio come oggetto composto da $gheader $messagio $ footer
                     
                     //utile anzi fondamentale
                     $plugindir   = "sendit/";
                     $sendit_root = get_option('siteurl') . '/wp-content/plugins/'.$plugindir;
                     $siteurl = get_option('siteurl');
+                    
+                    $headers= "MIME-Version: 1.0\n" .
+		        	"From: ".$templaterow->email_lista." <".$templaterow->email_lista.">\n" .
+		        	"Content-Type: text/html; charset=\"" .
+					get_option('blog_charset') . "\"\n";                
+
                     
                     $header= $templaterow->header;
                     //$messaggio= $templaterow->welcome;
@@ -59,57 +64,17 @@ function AggiungiEmail() {
                     
                     $content_send = $header.$messaggio.$footer;
                     #### Creo object PHPMailer e imposto le COSTANTI SMTP PHPMAILER
-                    $mail = new PHPMailer();
+                    //$mail = new PHPMailer();
 
-                    if(get_option('sendit_smtp_host')!='') :    
-                    //print_r($mail);
-                        $mail->IsSMTP(); // telling the class to use SMTP
-                        
-                        
-                        $mail->Host = get_option('sendit_smtp_host'); // Host
-                        $mail->Hostname = get_option('sendit_smtp_hostname');// SMTP server hostname
-                        $mail->Port  = get_option('sendit_smtp_port');// set the SMTP port
-                        
-                        if(get_option('sendit_smtp_username')!=''):    
-                            $mail->SMTPAuth = true;     // turn on SMTP authentication
-                            $mail->Username = get_option('sendit_smtp_username');  // SMTP username
-                            $mail->Password = get_option('sendit_smtp_password'); // SMTP password
-            
-								if(get_option('sendit_smtp_ssl')!=''):	
-									$mail->SMTPSecure = get_option('sendit_smtp_ssl'); // SMTP ssl
-								endif;
-
-                        else :
-                            $mail->SMTPAuth = false;// disable SMTP authentication
-                        endif;
-                    endif;
-                    
-                    $mail->SetFrom($templaterow->email_lista);
-                    //$mail->AddReplyTo('pinobulini@gmail.com');
-                    $mail->Subject = $welcome;
-                    $mail->AltBody = " To view the message, please use an HTML compatible email viewer!";
-                    // optional, comment out and test
-                    $mail->MsgHTML($content_send);
-                    
-                     $admin_mail_message = __('New subscriber for your newsletter: ', 'sendit'). get_bloginfo('blog_name');        
-
-                     $mail->AddAddress($_POST['email_add']);
-                     if($mail->Send()) :
-                        //echo $successo ;
-                         die( "document.getElementById('dati').innerHTML = $successo;" );
+					if(wp_mail($_POST['email_add'], $welcome ,$content_send, $headers, $attachments)):
+                         //admin notification
+                         wp_mail($templaterow->email_lista, __('New subscriber for your newsletter: ', 'sendit').get_bloginfo('blog_name'), __('New subscriber for your newsletter: '.$_POST['email_add'], 'sendit').get_bloginfo('blog_name'));
+                         die($successo);
                      else :
-                         
-                         //echo $errore;
-                         die( "document.getElementById('dati').innerHTML = $errore;" );
+						 //echo $errore;
+                         die($errore);
                      endif;
-                    //notifica a admin
-                    $mail->ClearAddresses();
-                    $mail->AddAddress($templaterow->email_lista);
-                    $mail->Subject = $admin_mail_message;
-                    $mail->AltBody = __('New subscriber for your newsletter: ', 'sendit').get_bloginfo('blog_name');
-                    // optional, comment out and test
-                    $mail->MsgHTML($_POST['email_add'].__(' subscribe to your mailing list:   ').get_bloginfo('url'));
-                    $mail->Send();
+
                 endif;
 
             endif;    
@@ -120,9 +85,37 @@ function AggiungiEmail() {
 }
 
 
+add_action('phpmailer_init','phpmailer_init_smtp');
 
 
+if (!function_exists('phpmailer_init_smtp')) {
+	
+	// This code is copied, from wp-includes/pluggable.php as at version 2.2.2
+	function phpmailer_init_smtp($phpmailer) {
 
+
+		
+		// Set the mailer type as per config above, this overrides the already called isMail method
+		if(get_option('sendit_smtp_host')!='') {
+			$phpmailer->Mailer = 'smtp';			
+			// If we're sending via SMTP, set the host
+			$phpmailer->Host = get_option('sendit_smtp_host');
+			// If we're using smtp auth, set the username & password SO WE USE AUTH
+			if (get_option('sendit_smtp_username')!='') {
+				$phpmailer->SMTPAuth = TRUE;
+				$phpmailer->Username = get_option('sendit_smtp_username');
+				$phpmailer->Password = get_option('sendit_smtp_password');
+			}
+		}
+		
+		// You can add your own options here, see the phpmailer documentation for more info:
+		// http://phpmailer.sourceforge.net/docs/
+		
+		// Stop adding options here.
+		
+	} // End of phpmailer_init_smtp() function definition
+
+}
 
 AggiungiEmail();
 
