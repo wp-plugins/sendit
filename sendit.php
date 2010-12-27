@@ -4,8 +4,8 @@ Plugin Name: Sendit!
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: For professional use buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
-import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1)
-Version: 1.5.6
+import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1). 
+Version: 1.5.7
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -345,10 +345,14 @@ if (function_exists('sendit_check')) {
     add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'cron_settings');
 }
 
-/*1.5.6 export addon*/
-if (function_exists('sendit_check')) 
+/*1.5.7 export addon*/
+if (function_exists('sendit_csv_export')) 
 {
 	add_submenu_page(__FILE__, __('Export list', 'sendit'), __('Export list', 'sendit'), 8, 'export-subscribers', 'export_subscribers');
+}
+else
+{
+	add_submenu_page(__FILE__, __('Export list', 'sendit'), __('Export list', 'sendit'), 8, 'export-subscribers', 'export_subscribers_screen');
 }
 
     
@@ -1413,6 +1417,20 @@ function Iscritti() {
   
     
 }
+
+
+
+function export_subscribers_screen()
+{ ?>
+	<div class="wrap">
+
+	<h2><?php echo __('To export Sendit mailing list you need to buy Sendit pro exporter','sendit');?></h2>
+		<p><?php echo __('With Sendit pro export tool (available now for only 5 euros) you will be able to export and reimport as CSV files all your Sendit subscribers'); ?></p>
+		<a class="button primary" href="http://sendit.wordpressplanet.org/plugin-shop/wordpress-plugin/sendit-pro-csv-list-exporter/"><?php echo __('Buy this plugin Now for 5 euros', 'Sendit'); ?></a>
+	
+	</div>
+<? }
+
 
 function export_subscribers() {
 	global $wpdb;
