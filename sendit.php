@@ -5,7 +5,7 @@ Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: For professional use buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
 send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
 import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1). 
-Version: 1.5.7
+Version: 1.5.8
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -38,7 +38,7 @@ jQuery(document).ready(function(){
 	jQuery('#sendit_subscribe_button').click(function(){
 		jQuery.ajax({
 		type: "POST",
-      	data: ({email_add : $('#email_add').val(),lista : $('#lista').val()}),  		
+      	data: ({email_add : jQuery('#email_add').val(),lista : jQuery('#lista').val()}),  		
       	url: '<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/submit.php',
   		success: function(data) {
     	jQuery('#dati').html(data);
