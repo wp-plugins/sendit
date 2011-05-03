@@ -2,10 +2,8 @@
 /*
 Plugin Name: Sendit!
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
-Description: For professional use buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to
-send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and
-import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1). 
-Version: 1.5.8
+Description: For professional use is strongly recommended to buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1). Version 1.5.9 fixes the Tinymce editor. 
+Version: 1.5.9
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -15,6 +13,7 @@ add_action('wp_head', 'Pushsack');
 add_action('admin_menu', 'gestisci_menu');
 add_action('plugins_loaded','DisplayForm');
 add_action('admin_head', 'Pusheditor');
+
 
 load_plugin_textdomain('sendit', false, basename(dirname(__FILE__)) . '/languages'); //thanks to Davide http://www.jqueryitalia.org
 
@@ -97,7 +96,7 @@ if (stristr($text, '[newsletter' ))
                 <p>
                 <input id=\"email_add\" type=\"text\" value=\"\" name=\"email_add\"/>
                     <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".$match[1]."\">
-                <input class=\"button\" type=\"button\" id=\"agg_email\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
+                <input class=\"button\" type=\"button\" id=\"sendit_subscribe_button\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
                 </p>
                     <small>Sendit <a href=\"http://www.giuseppesurace.com\" title=\"Wordpress newsletter plugin\">Wordpress newsletter</a></small>
             </form>
@@ -200,29 +199,21 @@ function DisplayForm()
 }
 
 
-function Pusheditor() {
-        //metto il js dell editor solo dove serve!
-        if ($_GET['page']=="sendit/sendit.php") :
-?>
-<!--Sendit Wordpress plugin js scripts by http://www.giuseppesurace.com -->
-<script type="text/javascript" src="../wp-includes/js/tinymce/tiny_mce.js"></script>
-<script type="text/javascript">
-<!--
-tinyMCE.init({
-theme : "advanced",
-skin : "wp_theme",
-mode : "exact",
-elements : "messaggio",
-width : "565",
-height : "350",
-theme_advanced_toolbar_location : "top",
-theme_advanced_toolbar_align : "left"
 
-    });
--->
-</script>
-    <?php    
-endif;
+
+
+
+function Pusheditor() {
+	wp_enqueue_script('editor');
+	wp_enqueue_script('thickbox');
+	wp_enqueue_script('media-upload');
+
+		wp_tiny_mce( true , // true makes the editor "teeny"
+			array(
+				"editor_selector" => "messaggio"
+			)
+		);
+
 }
 
 /*
@@ -900,9 +891,8 @@ function invianewsletter() {
 
     global $_POST;
     global $wpdb;
- 
-      
-     echo "<div class=\"wrap\"><h2>".__('Send Newsletter', 'sendit')."</h2>";
+
+ echo "<div class=\"wrap\"><h2>".__('Send Newsletter', 'sendit')."</h2>";
 	
 	if(function_exists('sendit_check'))
 	{
@@ -1090,7 +1080,7 @@ function invianewsletter() {
             <tr><th scope="row" width="250"><label for="oggetto">'.__("Subject", "sendit").'</label><th>
             <td><input type="text" name="oggetto" id="oggetto" style="width:250px" value="'.$title.'" ></td></tr>
             <tr><th scope="row" width="250"><label for="messaggio">Newsletter</label><th>
-            <td><textarea id="messaggio" name="messaggio" cols="70" rows="15">'.$content_with_absolute_url.'</textarea>
+            <td><textarea class="messaggio" id="messaggio" name="messaggio" cols="70" rows="15">'.$content_with_absolute_url.'</textarea>
             
             </td></tr>
             <tr><th scope="row" width="250"><th>
