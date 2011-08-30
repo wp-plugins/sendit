@@ -22,7 +22,7 @@ function AggiungiEmail() {
                die($errore); 
 
       else :
-		$lista=escape($_POST['lista']);
+		$lista=mysql_real_escape_string($_POST['lista']);
 		$lista=(int)$lista;
         
         $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$_POST[email_add]' and id_lista = $lista;");
