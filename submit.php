@@ -22,9 +22,10 @@ function AggiungiEmail() {
                die($errore); 
 
       else :
-
+		$lista=escape($_POST['lista']);
+		$lista=(int)$lista;
         
-        $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$_POST[email_add]' and id_lista = '$_POST[lista]';");
+        $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$_POST[email_add]' and id_lista = $lista;");
         
             if($user_count>0) :
                 $errore_presente = "<div class=\"error\">".__('email address already present', 'sendit')."</div>";
@@ -34,13 +35,13 @@ function AggiungiEmail() {
                 //genero stringa univoca x conferme sicure
                 $code = md5(uniqid(rand(), true));
                 
-                 $wpdb->query("INSERT INTO $table_email (email, id_lista, magic_string, accepted) VALUES ('$_POST[email_add]', '$_POST[lista]','$code','n')");
+                 $wpdb->query("INSERT INTO $table_email (email, id_lista, magic_string, accepted) VALUES ('$_POST[email_add]', $lista,'$code','n')");
                         
                  /*qui mando email*/
                 
                 $table_liste = $wpdb->prefix . "nl_liste";
                 
-                    $templaterow=$wpdb->get_row("SELECT * from $table_liste where id_lista = '$_POST[lista]' ");
+                    $templaterow=$wpdb->get_row("SELECT * from $table_liste where id_lista = $lista ");
                     //costruisco il messaggio come oggetto composto da $gheader $messagio $ footer
                     
                     //utile anzi fondamentale
