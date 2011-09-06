@@ -3,7 +3,7 @@
 Plugin Name: Sendit!
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: For professional use is strongly recommended to buy http://sendit.wordpressplanet.org With Sendit you can Send your post to your subscribers with Sendit, an italian plugin that allows you to send newsletter and manage mailing list in 2 click. New version also include an SMTP configuration and import functions from comments and author emails. It can be used with a template tag in your post or page content or subscribtion widget on your Sidebar. Now you can set interval and emails block (Polish language added in 1.5.1). Version 1.5.9 fixes the Tinymce editor. 
-Version: 1.6.1
+Version: 1.6.2
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -36,12 +36,15 @@ function Pushsack() // Spingo ajax su header
 jQuery(document).ready(function(){
 	jQuery('#sendit_subscribe_button').click(function(){
 		jQuery.ajax({
+		beforeSend: function() { jQuery('#sendit_wait').show(); jQuery('#sendit_subscribe_button').hide();},
+        complete: function() { jQuery('#sendit_wait').hide(); jQuery('#sendit_subscribe_button').show(); },
 		type: "POST",
       	data: ({email_add : jQuery('#email_add').val(),lista : jQuery('#lista').val()}),  		
       	url: '<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/submit.php',
   		success: function(data) {
-    	jQuery('#dati').html(data);
-    /*alert(data);*/
+    	/*jQuery('#dati').html(data);*/
+   		alert(data);
+   		
   }
 });
 	});
@@ -100,7 +103,7 @@ if (stristr($text, '[newsletter' ))
                 </p>
                     <small>Sendit <a href=\"http://www.giuseppesurace.com\" title=\"Wordpress newsletter plugin\">Wordpress newsletter</a></small>
             </form>
-            
+            <div id=\"sendit_wait\" style=\"display:none;\"></div>
             <div id=\"dati\"></div>";
     
     $text = str_replace($match[0], $form_aggiunta, $text);
@@ -148,10 +151,15 @@ function JqueryForm($args) {
             <input id=\"email_add\" type=\"text\" value=\"email\" name=\"email_add\" onFocus=\"clearText(this)\"/>
                 <input type=\"hidden\" name=\"lista\" id=\"lista\" value=\"".get_option('id_lista')."\">
             <input class=\"button\" type=\"button\" id=\"sendit_subscribe_button\" name=\"agg_email\" value=\"".__('Subscribe', 'sendit')."\"/>
-            </p>";
+       
+           	<div id=\"sendit_wait\" style=\"display:none;\"></div>
+
+            
+            ";
             if (!$dcl_global) $form_aggiunta.="<p><small>Sendit <a href=\"http://www.giuseppesurace.com\">Wordpress  newsletter</a></small></p>";
             $form_aggiunta.="
-        </form><div id=\"dati\"></div></div>".$after_widget;
+        </form>
+			</div>".$after_widget;
     
     echo $form_aggiunta;
 }
@@ -1137,8 +1145,21 @@ if (!function_exists('phpmailer_init_smtp')) {
 
 
 
+//new version add loading gif to wp_head css 1.6.2 ->>>
+add_action('wp_head', 'sendit_loading_image');
+
+
+function sendit_loading_image() {
+    $siteurl = get_option('siteurl');
+    $img_url = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/images/loading.gif';
+    echo '<style type="text/css">#sendit_wait{background:url('.$img_url.') no-repeat; height:40px;margin:10px;display:block;}</style>';
+    //echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
+}
+
+
 
 add_action('admin_head', 'sendit_register_head');
+add_action('wp_head', 'sendit_register_head');
 
 function sendit_register_head() {
     $siteurl = get_option('siteurl');
