@@ -2,7 +2,7 @@
 
 .sendit{
 background:#f9f9f9;
-padding:0 20px;
+padding-top:10px;
 border:1px solid #efefef;
 }
 .sendit h3, .sendit h4{
@@ -15,9 +15,17 @@ width: 120px;
 font-weight: bold;
 }
 
+#sendit_subscribe_button{display:block;margin:5px 0}
+
 .sendit input, .sendit textarea, .sendit select{
-width: 180px;
-margin-bottom: 5px;
+/*width: 180px;*/
+background:#FFFFFF;
+    border: 1px solid #BBBBBB;
+    border-radius: 2px 2px 2px 2px;
+    margin: 0 5px 0 0;
+    padding: 4px;
+
+
 }
 .short{
 width: 100px;
@@ -36,7 +44,7 @@ width: 1em;
 #submitbutton{
 
 margin-top: 5px;
-width: 80px;
+width: 180px;
 }
 
 .sendit br{

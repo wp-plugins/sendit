@@ -4,13 +4,14 @@ Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 2.3.0
 Tested up to: 3.2.1
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 
 Sendit is a mailing lists and newsletter plugin for Wordpress to manage mailing list.
 
 == Description == 
 Sendit enable you to send newsletters and collect subscribers from your blog. You can manage one or more list and using in post/pages or using the widget(customizable). You can extract content from post or pages or create your content to send to subscribers. You can also edit the template for each mailing lists just put some XHTML code on header and footer. Newsletter will be send in XHTML format. Checkout the professional newsletter scheduler Sendit Pro to use with cron jobs: http://sendit.wordpressplanet.org
 
+Version 1.6.2 Radical changes! Loading animation on submit and no more ajax response but a simple Alert! for all of you that are missing the confirmation message
 Version 1.6.0 fixes the exploit for sql injection on submit
 Version 1.5.9 fixes the Tinymce editor to appear in the newsletter section
 Version 1.5.8 set the jQuery in noconflict mode

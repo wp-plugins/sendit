@@ -12,9 +12,11 @@ function AggiungiEmail() {
     
     //messaggio di successo
      $successo="<div id=\"message\" class=\"updated fade\"><p><strong>".__('Subscription completed now Check your email and confirm', 'sendit')."</p></div>";
+     $successo=strip_tags($successo);
     //messaggio di errore
     $errore="<div id=\"message\" class=\"updated fade\"><p><strong>".__('not valid email address', 'sendit')."</strong></p></div>";
-    
+    $errore=strip_tags($errore);
+
     if(isset($_POST['email_add'])):   
     
     if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $_POST['email_add'])) :
@@ -29,6 +31,7 @@ function AggiungiEmail() {
         
             if($user_count>0) :
                 $errore_presente = "<div class=\"error\">".__('email address already present', 'sendit')."</div>";
+            $errore_presente=strip_tags($errore_presente);
                 die($errore_presente);
             else :
             
