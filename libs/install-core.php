@@ -11,7 +11,7 @@ global $wpdb;
 function sendit_install() {
    global $wpdb;
    global $sendit_db_version;
-   $sendit_db_version = "2.1";
+   $sendit_db_version = "2.4";
    $installed_version = get_option('sendit_db_version');
 	/*
 	++++++++++++++++++++++++++++
@@ -54,9 +54,13 @@ function sendit_install() {
                    PRIMARY KEY  (`id_lista`)
                  );";
 
+   $sql_alter="ALTER TABLE ". SENDIT_EMAIL_TABLE ." add column subscriber_info text default NULL";
+
+
    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
    dbDelta($sql_email);
    dbDelta($sql_liste);   
+   dbDelta($sql_alter);   
    
    
     
