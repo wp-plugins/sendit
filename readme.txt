@@ -1,4 +1,4 @@
-=== Sendit 2 ===
+=== Sendit ===
 Contributors: Giuseppe Surace
 Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
