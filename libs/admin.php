@@ -622,7 +622,6 @@ function Iscritti() {
 						<th>".__('status', 'sendit')."</th>
 						<th>".__('Additional info', 'sendit')."</th>
 						<th>".__('actions', 'sendit')."</th>
-
 					</tr>
 				</tfoot>
 </table><br clear=\"all\" />";
