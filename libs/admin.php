@@ -220,49 +220,24 @@ function SmtpSettings()
 		</select>
         </td>
     </tr>
-	<tr>
-        <th colspan="2">
-        <h3>'.__('These settings are useful if you want to send email blocks and stop for some seconds','sendit').'</h3>
-        </th>
-    </tr> 
-        <tr>
-        <th><label for="sendit_sleep_time">Usleep interval (seconds)</label></th>
-        <td><select name="sendit_sleep_time" id="sendit_sleep_time">
-        		<option value="'.get_option('sendit_sleep_time').'" selected="selected" />'.substr(get_option('sendit_sleep_time'),0,2).'</option>
-        		<option value="0">0</option>
-        		<option value="10000000">10</option>
-        		<option value="20000000">20</option>
-        		<option value="30000000">30</option>
-        		<option value="40000000">40</option>
-		</select>
-        		
-        </td>
-    </tr>
 
-
-        <tr>
-        <th><label for="sendit_sleep_each">each (email sent)</label></th>
-        <td>
-        <select name="sendit_sleep_each" id="sendit_sleep_each">
-        		<option value="'.get_option('sendit_sleep_each').'" selected="selected" />'.get_option('sendit_sleep_each').'</option>
-        		<option value="0">0</option>
-        		<option value="10">10</option>
-        		<option value="20">20</option>
-        		<option value="30">30</option>
-        		<option value="40">40</option>
-        		<option value="50">50</option>
-        		<option value="60">60</option>
-        		<option value="70">70</option>
-        		<option value="80">80</option>
-        		<option value="90">90</option>
-        		<option value="100">100</option>
-		</select>
-        		
-        </td>
-    </tr>
 
 </table>
+<div class="suggest">
+<p>
+<i>'.
+__('Are you on panic for large mailing lists, bad delivery (spam etc)?','sendit').'<br />';
 
+$markup.='<strong>Relax!</strong>'.__('Let SendGrid handle your email delivery used with Sendit. Get 25% off any plan by clicking my link.','sendit');
+
+$markup.='<br /><a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a><br />';
+
+$markup.='SendGrid helps you reach more users instead of spam folders. Click this link to get your 25% discount on your first month\'s membership. Believe me you will be addicted!<br />';
+
+$markup.='<a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a>';
+
+$markup.='<br />Best<br />Giuseppe</i>
+</p></div>
 
 <p class="submit">
     <input type="submit" name="submit" class="button-primary sendit_actionbuttons" value="'.__('Save settings', 'sendit').'" />
@@ -559,6 +534,7 @@ function Iscritti() {
 			<table class=\"widefat post fixed\">
 				<thead>
 					<tr>
+						<th style=\"width:30px !important;\"></th>
 						<th>".__('email', 'sendit')."</th>
 						<th>".__('status', 'sendit')."</th>
 						<th>".__('Additional info', 'sendit')."</th>
@@ -597,7 +573,7 @@ function Iscritti() {
              
         echo "<tr>	
         		<form action=\"#email_".$email->id_email."\" method=\"post\">
-
+				<td class=\"grav\" style=\"width:30px !important;\">".get_avatar($email->email,'24')."</td>
                 <td id=\"email_".$email->id_email."\">
                    
                         <!--input type=\"checkbox\" name=\"email_handler[]\" value=\"".$email->id_email."\">-->
@@ -641,6 +617,7 @@ function Iscritti() {
     
     echo "		<tfoot>
 					<tr>
+						<th></th>
 						<th>".__('email', 'sendit')."</th>
 						<th>".__('status', 'sendit')."</th>
 						<th>".__('actions', 'sendit')."</th>
