@@ -617,9 +617,10 @@ function Iscritti() {
     
     echo "		<tfoot>
 					<tr>
-						<th></th>
+						<th style=\"width:30px !important;\"></th>
 						<th>".__('email', 'sendit')."</th>
 						<th>".__('status', 'sendit')."</th>
+						<th>".__('Additional info', 'sendit')."</th>
 						<th>".__('actions', 'sendit')."</th>
 
 					</tr>
