@@ -9,9 +9,10 @@ global $wpdb;
 
 
 function sendit_install() {
+   global $_GET;
    global $wpdb;
    global $sendit_db_version;
-   $sendit_db_version = "2.5";
+   $sendit_db_version = SENDIT_DB_VERSION;
    $installed_version = get_option('sendit_db_version');
 	/*
 	++++++++++++++++++++++++++++
@@ -22,7 +23,7 @@ function sendit_install() {
    $table_liste = $wpdb->prefix . "nl_liste";
  
    if( $installed_version != $sendit_db_version ) {
-     
+
    $sql_email = "CREATE TABLE " . SENDIT_EMAIL_TABLE . " (
 	  		  	id_email int(11) NOT NULL AUTO_INCREMENT,
               	id_lista  int(11) default '1',
@@ -39,7 +40,7 @@ function sendit_install() {
     );";
      update_option("sendit_db_version", $sendit_db_version);
   
-    }
+   
 	/*
 	++++++++++++++++++++++++++++
 	Table: wp_nl_liste
@@ -167,6 +168,14 @@ function sendit_install() {
 	if(get_option('sendit_response_mode')=='') update_option('sendit_response_mode', 'ajax');
 	if(get_option('sendit_unsubscribe_link')=='') update_option('sendit_unsubscribe_link', 'yes');
 	if(get_option('sendit_gravatar')=='') update_option('sendit_gravatar', 'yes');
+	
+	if($_GET['upgrade_from_box']==1):
+        	echo '<div class="updated"><h2>';
+        	printf(__('Your Sendit Database table Structure is succesfully updated to version: '.SENDIT_DB_VERSION.' | <a href="%1$s">Hide this Notice and get started! &raquo;</a>'), admin_url( 'admin.php?page=sendit/libs/admin.php&sendit_ignore=0'));
+        	echo "</h2></div>";
+  	endif;
+
+  }
 
 }
 
