@@ -712,6 +712,16 @@ function gestisci_menu() {
 	{
 		add_submenu_page(__FILE__, __('Export list', 'sendit'), __('Export list', 'sendit'), 8, 'export-subscribers', 'export_subscribers_screen');
 	}
+	
+		/*option to force upgrade 2.0.8 */
+	   $sendit_db_version = SENDIT_DB_VERSION;
+   	   $installed_version = get_option('sendit_db_version');
+	
+	if ($sendit_db_version!=$installed_version) 
+	{
+		add_submenu_page(__FILE__, __('Update', 'sendit'), __('Upgrade your plugin', 'sendit'), 8, 'update-sendit', 'sendit_install');
+	}
+	
 
     
     
