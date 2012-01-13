@@ -352,8 +352,8 @@ function MainSettings($c='')
 	$markup.='<div class="sendit_box_list sendit_box_menu"><h2>'.__('Lists and Template', 'sendit').'</h2>
 			  	<a href="'.admin_url( 'admin.php?page=lists-management').'" class="button-primary">'.__('Create and manage lists', 'sendit').'</a>
 			  </div>
-			  <div class="sendit_box_design sendit_box_menu"><h2>'.__('Design Widget', 'sendit').'</h2>
-			  	<a href="'.admin_url( 'admin.php?page=sendit_widget_settings').'" class="button-primary">'.__('Customize widget', 'sendit').'</a>
+			  <div class="sendit_box_design sendit_box_menu"><h2>'.__('Main Settings', 'sendit').'</h2>
+			  	<a href="'.admin_url( 'admin.php?page=sendit_general_settings').'" class="button-primary">'.__('Main Settings', 'sendit').'</a>
 			  </div>
 			  <div class="sendit_box_sendnewsletter sendit_box_menu"><h2>'.__('Send Newsletter', 'sendit').'</h2>
 			  	<a href="'.admin_url( 'post-new.php?post_type=newsletter').'" class="button-primary">'.__('Create and send newsletter', 'sendit').'</a>
