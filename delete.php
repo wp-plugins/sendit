@@ -1,7 +1,8 @@
 <?php
 
 include("../../../wp-blog-header.php"); 
-
+status_header(200);
+nocache_headers();
 /*
   QUESTO FILE CANCELLA L'INDIRIZZO EMAIL DALLA LISTA
  */
