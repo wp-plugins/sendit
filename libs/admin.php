@@ -365,11 +365,20 @@ function MainSettings($c='')
 			  
 	$markup.='<div class="sendit_box_export sendit_box_menu"><h2>'.__('Export mailing lists', 'sendit').'</h2>
 			  	<a href="'.admin_url('admin.php?page=export-subscribers').'" class="button-primary">'.__('Save your list as CSV', 'sendit').'</a>
-			  </div>
-			  <div class="sendit_box_cron sendit_box_menu"><h2>'.__('Cron Settings', 'sendit').'</h2>
+			  </div>';
+	//new from 2.1.0 to hide cron settings if you dont have the scheduler active
+	if (is_plugin_active('sendit-scheduler/sendit-cron.php')) {
+	
+	$markup.='<div class="sendit_box_cron sendit_box_menu"><h2>'.__('Cron Settings', 'sendit').'</h2>
 			  	<a href="'.admin_url('admin.php?page=cron-settings').'" class="button-primary">'.__('Cron settings', 'sendit').'</a>
 			  </div>';	
-
+	} else {
+	
+	$markup.='<div class="sendit_box_shop sendit_box_menu"><h2>'.__('Extend your plugin', 'sendit').'</h2>
+		  	<a href="http://sendit.wordpressplanet.org" class="button-primary">'.__('Go to the shop', 'sendit').'</a>
+		  </div>';	
+	
+	}
 
     $markup.='</div>';
 
@@ -377,9 +386,334 @@ function MainSettings($c='')
 
 }
 
+/**********PAGINA SEGMENTS **********/
+function Iscritti() {
+	require('pagination.class.php');
+    global $_POST;
+    global $wpdb;
+    
+    $table_email = $wpdb->prefix . "nl_email";
+    
+    if($_POST['delete'] && $_POST['email_handler']):   
+		$id_emails = implode(",", $_POST['email_handler']);
+        //echo $id_emails; 
+           $delete=$wpdb->query("delete from $table_email where id_email in ($id_emails)");                    
+           echo '<div id="message" class="updated fade"><p><strong>'.__("Email deleted succesfully!", "sendit").'</strong></p></div>';   
+           //print_r($_POST);
+   
+    endif;
+    
+    if($_POST['sublist']):   
+    	//echo $_GET['lista'];
+        //$code = md5(uniqid(rand(), true));
+        $id_emails = implode(",", $_POST['email_handler']);
+        //echo $id_emails; 
+
+        $emails=$wpdb->get_results("select * from $table_email where id_email in ($id_emails)");
+		
+		if(count($emails)>0):
+		$newlist = $wpdb->insert(SENDIT_LIST_TABLE, array('list_parent' => $_GET['lista'], 'nomelista' => 'Sublist '.$_GET['lista'].' segmented', 'email_lista' => get_bloginfo('admin_email'), 'header' =>$header_default, 'footer'=>$footer_default) );
+		$newlist_id=$wpdb->insert_id;
+				
+			foreach($emails as $email):
+	        	$code = md5(uniqid(rand(), true));
+	 			$insert=$wpdb->query("INSERT INTO $table_email (email,id_lista, magic_string, accepted) VALUES ('$email->email', $newlist_id, '$code', 'y')");
+			endforeach;		
+		endif;
+			
+          //print_r($emails);
+          
+           //$update=$wpdb->query("update $table_email set email = '$_POST[email]', magic_string='$_POST[code]', accepted = '$_POST[status]' where id_email = '$_POST[id_email]'");
+           
+           echo '<div id="message" class="updated fade"><p><strong>'.__('bo', 'sendit').'</p></div>';
+    endif;
+
+
+
+    //modifica provamoce
+    if($_POST['update']):   
+        //$code = md5(uniqid(rand(), true));
+           
+           $update=$wpdb->query("update $table_email set email = '$_POST[email]', magic_string='$_POST[code]', accepted = '$_POST[status]' where id_email = '$_POST[id_email]'");
+           
+           echo '<div id="message" class="updated fade"><p><strong>'.sprintf(__('email %s edited succesfully', 'sendit'), $_POST[email]).'</p></div>';   
+           //print_r($_POST);
+   
+    endif;
+    
+ 
+ 
+     if($_POST['add_email']):   
+        //$code = md5(uniqid(rand(), true));
+           
+           $update=$wpdb->query("update $table_email set email = '$_POST[email]', magic_string='$_POST[code]', accepted = '$_POST[status]' where id_email = '$_POST[id_email]'");
+           
+           echo '<div id="message" class="updated fade"><p><strong>'.sprintf(__('email %s edited succesfully', 'sendit'), $_POST[email]).'</p></div>';   
+           //print_r($_POST);
+   
+    endif;
+ 
+ 
+    
+   
+   //aggiunta indirizzo o indirizzi email dalla textarea
+  if($_POST['emails_add']!=""):   
+ 
+  //ver 1.1 multiaddress support
+  $email_add= explode("\n", $_POST['emails_add']);
+ 
+
+  foreach ($email_add as $key => $value) {
+      
+      //echo $value."<br />";
+        
+	//validation fix 1.5.6 (also there!) {2,4}    
+      if (!ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", trim($value))) :
+       
+               echo '<div id="message" class="error"><p><strong>indirizzo email '.$value.' non valido!</strong></p></div>';
+
+      else :
+
+        
+            
+            $user_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_email where email ='$value' and id_lista = '$_GET[lista]' order by email;");
+            
+                if($user_count>0) :
+                    echo "<div class=\"error\"><p><strong>".sprintf(__('email %s already present', 'sendit'), $value)."</strong></p></div>";
+                else :
+                //genero stringa univoca x conferme e cancellazioni sicure
+                    $code = md5(uniqid(rand(), true));
+                    $wpdb->query("INSERT INTO $table_email (email,id_lista, magic_string, accepted) VALUES ('$value', '$_POST[id_lista]', '$code', 'y')");
+                     echo '<div class="updated fade"><p><strong>'.sprintf(__('email %s added succesfully!', 'sendit'), $value).'</strong></p></div>';   
+                 endif;    
+        endif;
+        
+        
+        
+  }
+  //fine ciclo for
+        
+        
+        
+     endif;
+
+        
+    $email_items = $wpdb->get_var("SELECT count(*) FROM $table_email where id_lista= '$_GET[lista]'"); // number of total rows in the database
+	if($email_items > 0) {
+		$p = new pagination;
+		$p->items($email_items);
+		$p->limit(20); // Limit entries per page
+		$p->target("admin.php?page=lista-iscritti&lista=".$_GET['lista']);
+		$p->currentPage($_GET[$p->paging]); // Gets and validates the current page
+		$p->calculate(); // Calculates what to show
+		$p->parameterName('paging');
+		$p->adjacents(1); //No. of page away from the current page
+
+		if(!isset($_GET['paging'])) {
+			$p->page = 1;
+		} else {
+			$p->page = $_GET['paging'];
+		}
+
+		//Query for limit paging
+		$limit = "LIMIT " . ($p->page - 1) * $p->limit  . ", " . $p->limit;
+
+	} else {
+		//echo "No Record Found";
+	}
+
+   
+    
+    $emails = $wpdb->get_results("SELECT id_email, id_lista, email, subscriber_info, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' order by email $limit");
+    //email confermat
+    $emails_confirmed = $wpdb->get_results("SELECT id_email, id_lista, email, subscriber_info, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' and accepted='y'");
+
+    echo "<div class=\"wrap\"><h2>".__('Select List to Segment', 'sendit')."</h2>";
+    
+    
+    //estraggo le liste
+    $table_liste =  $wpdb->prefix . "nl_liste";   
+    $liste = $wpdb->get_results("SELECT id_lista, nomelista FROM $table_liste ");
+   // print_r($_POST);
+
+
+   
+   
+    echo "<div class=\"table\">
+			<table class=\"widefat  fixed\">
+				<thead>
+					<tr>
+						<th>".__('id', 'sendit')."</th>
+						<th class=".$css_list.">".__('mailing list', 'sendit')."</th>
+						<th>".__('actions', 'sendit')."</th>
+
+					</tr>
+				</thead><tbody>";
+
+            foreach ($liste as $lista) {
+
+                if ($_GET['lista']==$lista->id_lista) : $selected=" class=\"updated fade\"";  else : $selected=""; endif;     
+
+                echo "<tr >
+                		<td>".$lista->id_lista."</td>
+                		<td ".$selected."><a class=\"\" href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\">".$lista->nomelista."</a></td>
+                		<td></td><tr>";
+            }
+        echo"</tbody></table>
+        </div><br clear=\"all\ />";
+    
+    /*miglioro facendo comparire la form x aggiungere solo se selezionata una lista*/
+    if ($_GET['lista']) :
+        
+        echo "<h3>".__('Manual Subscribe mailing list ', 'sendit')." ".$_POST['lista']."</h3>
+
+                <label for=\"email_add\">".__('email address (one or more: default separator= line break)', 'sendit')."<br />
+               <div id=\"dashboard-widgets\" class=\"metabox-holder\">
+               <div class='postbox-container' style='width:49%;'>
+				<div id=\"normal-sortables\" class=\"meta-box-sortables\">
+				<div id=\"dashboard_right_now\" class=\"postbox \" >
+					<div class=\"handlediv\" title=\"Fare clic per cambiare.\"><br /></div>
+				<h3 class='hndle'><span>".__('Subscription','sendit')."</span></h3>
+				<div class=\"inside\">
+				        <p>".__('Copy here one or more email address', 'sendit')."</p>
+
+					           <form id=\"add\" name=\"add\" method=\"post\">
+
+                
+                <textarea id=\"emails_add\" type=\"text\" value=\"\" name=\"emails_add\" rows=\"10\" cols=\"50\"/></textarea></label>
+                 <input type=\"hidden\" name=\"id_lista\" value=\"".$_GET[lista]."\" /> 
+
+                <input class=\"button\" type=\"submit\" value=\"".__('Add', 'sendit')."\"/>
+                </p>
+                            </form>
+                </div>
+               </div>
+               </div>
+               </div>
+               </div>
+               <br clear=\"all\" />";
+        //posiziono la paginazione
+
+		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items." (".__('Subscriptions confirmed', 'sendit').": ".count($emails_confirmed).")</h3>";
+       if($p):
+			echo $p->show();
+		endif;
+
+        
+        echo "
+        <br clear=\"all\" />
+        <form action=\"\" method=\"post\">
+			<p><i>".__('Tips: now you can handle multiple email and editing email address and status simply clicking on it', 'sendit')."</i></p>
+			<table class=\"widefat post fixed\">
+				<thead>
+					<tr>";
+					if(get_option('sendit_gravatar')=='yes'):
+						echo "<th style=\"width:30px !important;\"></th>";
+				    endif;
+				   echo "<th style=\"width:30px !important;\"></th>
+				   		<th style=\"width:300px !important;\">".__('email', 'sendit')."</th>
+						<th style=\"width:100px !important;\">".__('status', 'sendit')."</th>
+						<th>".__('Additional info', 'sendit')."</th>
+					</tr>
+				</thead>
+    	
+        ";
+        
+      
+        foreach ($emails as $email) {
+            
+            //coloro le input per distinguere tra chi ha confermato e chi no
+            if ($email->accepted=="y") { 
+            	$style="style=\"vertical-align:middle; text-align:center; padding:0; background:#E4FFCF;\""; }
+            elseif ($email->accepted=="n") { 
+            	$style="style=\"vertical-align:middle; padding:0; text-align:center; background:#fffbcc;\""; }
+            else { 
+            	$style="style=\"vertical-align:middle; padding:0; text-align:center; background:#fd919b;\""; }
+            
+        	/*
+        	//fare funzione per ricaare i valori ovunque            
+        	$subscriber_info= json_decode($email->subscriber_info);  
+        	$subscriber_options = explode("&", $subscriber_info->options);
+        	$options='';
+        
+        	foreach($subscriber_options as $option):
+        		$option=explode("=", $option);
+        		if(!empty($option)):
+        		//stampo solo i campi unserializzati senza email_add e lista
+	        		if($option[0]!='email' and $option[0]!='lista'):
+	        			$options.=$option[0];
+	        			$options.=':';
+	        			$options.='<br />';
+	        			$options.='<input type="text" name="'.$option[0].'" value="'.urldecode($option[1]).'" />';
+	        			$options.='<br />';
+	        		endif;
+        		endif;
+
+        	endforeach;
+        */
+        if($email->accepted=='y') { $confirmed='confirmed'; } elseif($email->accepted=='d') {$confirmed='unsubscribed';} else {$confirmed='not confirmed';} 
+        echo "<tr>	";
+        		if(get_option('sendit_gravatar')=='yes'):
+					echo "<td class=\"grav\" style=\"width:30px !important;\">".get_avatar($email->email,'24')."</td>";
+				endif;
+                
+                echo "<td>
+                        <input type=\"checkbox\" name=\"email_handler[]\" value=\"".$email->id_email."\">
+                        </td>
+                        <td id=\"email_".$email->id_email."\">
+
+                        <input type='hidden' name='id_lista' value='".$email->id_lista."' />
+                        <div class='editable' id='email-".$email->id_email."'>".$email->email."</div>
+                        <input type='hidden' name='response_div' value='subscriber_".$email->id_lista."' />
+                        </td>
+                        <td   ".$style.">
+                        <div class='edit_select' id='accepted-".$email->id_email."'>".$confirmed."</div>
+                        </td>
+                       <td>".subscriber_options($email->subscriber_info)."</td>
+
+                       
+            </tr>    ";
+            
+        
+        }
+    
+    
+    
+    echo "		<tfoot>
+					<tr>";
+					
+				if(get_option('sendit_gravatar')=='yes'):
+					echo "<th style=\"width:30px !important;\"></th>";
+				endif;
+					echo "<th style=\"width:30px !important;\"></th>
+						<th>".__('email', 'sendit')."</th>
+						<th style=\"width:50px !important;\">".__('status', 'sendit')."</th>
+						<th>".__('Additional info', 'sendit')."</th>
+					</tr>
+				</tfoot>
+</table>
+<div class=\"clear\"></div>
+<input type=\"submit\" class=\"button-primary\" name=\"delete\" value=\"".__('Delete Selected emails', 'sendit')."\">
+
+</form>
+<br clear=\"all\" />";
+    //ripeto la paginazione
+    if($p):
+			echo $p->show();
+	endif;
+    
+    endif;    
+    
+    echo "</div>";
+  
+    
+}
+
+
+
 
 /**********PAGINA LISTA ISCRITTI**********/
-function Iscritti() {
+function Iscritti_ex() {
 	require('pagination.class.php');
     global $_POST;
     global $wpdb;
@@ -698,8 +1032,9 @@ function gestisci_menu() {
 	if ($wpdb->get_var("show tables like 'bb_press'") != '') :
 		add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from BBpress', 'sendit'), 8, 'import-bb-users', 'ImportBbPress');
 	endif;
-	
-	if (function_exists('sendit_check')) {
+	//fixed in 2.1.0 (permission denied)
+	if (is_plugin_active('sendit-scheduler/sendit-cron.php')) {
+	    //plugin is activated
 	    add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'cron_settings');
 	}
 	
@@ -723,6 +1058,39 @@ function gestisci_menu() {
     
     
 
+}
+
+
+function subscriber_options($json)
+{
+     /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     	custom fields loop and form input auto generation
+     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+	$sendit_morefields=get_option('sendit_dynamic_settings');
+	$markup='';	
+	$valori=json_decode($json);
+	$info_string= $valori->options;
+	
+	$explodes=explode("&", $info_string);
+	
+	//print_r($explodes);
+	
+	foreach($explodes as $explode):
+		$chiave=explode("=", $explode);
+		if($chiave[1]!=''):
+			if($chiave[0]!='email_add' and $chiave[0]!='lista' ):
+				$markup.= $chiave[0];
+	 			$markup.=': <strong>'. $chiave[1].'</strong> ';
+	 			//$markup.= '<input type="text" name="subscriber_option['.$chiave[0].']" class="'.$v->class.' '.$v->rules.'" value="'.$chiave[1].'">'; 
+	 		endif;	
+		endif;
+	endforeach;
+ 	
+ 	//$arr=json_decode($sendit_morefields);
+ 	//$c = array_combine((array) $explodes, (array) $arr);
+ 	//print_r($c);
+ 		return $markup; 	
 }
 
 ?>

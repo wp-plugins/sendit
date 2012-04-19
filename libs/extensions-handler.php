@@ -265,7 +265,7 @@ function send_newsletter($post_ID)
 
 	if($send_now==1):
 		foreach($subscribers as $subscriber):
-			if(get_option('sendit_unsubscribe_link')=='y'):
+			if(get_option('sendit_unsubscribe_link')=='yes'):
 			
 				//aggiungo messaggio con il link di cancelazione che cicla il magic_string..
 				$delete_link="

@@ -2,8 +2,8 @@
 /*
 Plugin Name: Sendit
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
-Description: Wordpress newsletter plugin Sendit v 2 is totally rebuilt and custom post type based. You can extend it and buy scheduler and newsletter tracking tool, more fields tool, export tool and others at http://sendit.wordpressplanet.org. With the new Sendit you can Send also  one of more of your post to your subscribers and manage mailing list in 2 click. New version also include an SMTP configuration and import functions from comments and author emails.
-Version: 2.0.9
+Description: Wordpress newsletter plugin Sendit v 2 is totally rebuilt and custom post type based. Multiple ajax management added to 2.1.0. You can extend it and buy scheduler and newsletter tracking tool, more fields tool, export tool and others at http://sendit.wordpressplanet.org. With the new Sendit you can Send also  one of more of your post to your subscribers and manage mailing list in 2 click. New version also include an SMTP configuration and import functions from comments and author emails.
+Version: 2.1.0
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
