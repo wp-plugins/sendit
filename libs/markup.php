@@ -25,7 +25,7 @@ function sendit_markup($id)
 			
  	$sendit_markup=str_replace("{subscribe_text}", get_option('sendit_subscribe_button_text'), $sendit_markup);
  	if(is_user_logged_in()):
-		$sendit_markup.='<small><a href="wp-admin/admin.php?page=sendit_widget_settings">'.__('Customize Widget','sendit').'</a></small>';
+		$sendit_markup.='<small><a href="wp-admin/admin.php?page=sendit_general_settings">'.__('Customize Widget','sendit').'</a></small>';
  	endif;
  	return $sendit_markup;
 
@@ -155,7 +155,7 @@ function sendit_register_head() {
 function sendit_admin_js()
 {
 	?>
-
+	<script type="text/javascript" src="<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/jquery.jeditable.js" ></script>
     <script type="text/javascript">
 	jQuery(document).ready(function($) {        
      
@@ -164,6 +164,37 @@ function sendit_admin_js()
                    alert('Article added to your newsletter');
                    send_to_editor(post_title);
               });
+              
+              $(".editable").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+              type : "text",
+              submit    : "OK",
+              name : "email",
+      		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+      		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+              }
+              );
+              
+              
+              $(".edit_select").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+              type : "select",
+              data   : "{'n':'<?php echo __('not confirmed','sendit'); ?>','y':'<?php echo __('confirmed','sendit'); ?>','d':'<?php echo __('delete','sendit'); ?>'}",
+              submit    : "OK",
+              name : "accepted",
+      		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+      		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+              }
+              );
+              
+             /* todo!!!
+             $(".buttonsend").click(function(){
+              $.post("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", { name: "John", time: "2pm" },
+   				function(data) {
+    			 alert("Data Loaded: " + data);
+   				});
+   			 });
+   			 */
+              
+              
  });
 	</script>
 <?php
