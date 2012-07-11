@@ -7,8 +7,10 @@ global $wpdb;
 //print_r($_POST);
 //let me parse
 foreach($_POST as $k=>$v):
-	$id= explode("-", $_POST['id']);
+
+	$id= explode("-", esc_attr($_POST['id']));
 	$id=$id[1];
+	$id=(int)$id;
 
 	if($k!='id'):
 	   	if($k!='email'):
