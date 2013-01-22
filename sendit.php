@@ -3,7 +3,7 @@
 Plugin Name: Sendit
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: Wordpress newsletter plugin Sendit v 2 is totally rebuilt and custom post type based. Multiple ajax management added to 2.1.0. You can extend it and buy scheduler and newsletter tracking tool, more fields tool, export tool and others at http://sendit.wordpressplanet.org. With the new Sendit you can Send also  one of more of your post to your subscribers and manage mailing list in 2 click. New version also include an SMTP configuration and import functions from comments and author emails.
-Version: 2.1.0
+Version: 2.1.1
 Author: Giuseppe Surace
 Author URI: http://www.giuseppesurace.com
 */
@@ -11,9 +11,14 @@ Author URI: http://www.giuseppesurace.com
 include_once plugin_dir_path( __FILE__ ).'/libs/install-core.php';
 include_once plugin_dir_path( __FILE__ ).'/libs/markup.php';
 include_once plugin_dir_path( __FILE__ ).'/libs/actions.php';
-include_once plugin_dir_path( __FILE__ ).'/libs/admin.php';
+include_once plugin_dir_path( __FILE__ ).'/libs/admin/admin-core.php';
 include_once plugin_dir_path( __FILE__ ).'/libs/extensions-handler.php';
 include_once plugin_dir_path( __FILE__ ).'/libs/import.php';
+
+//new folder filesystem pre setup
+include_once plugin_dir_path( __FILE__ ).'/libs/admin/meta-boxes.php';
+include_once plugin_dir_path( __FILE__ ).'/libs/frontend/frontend.php';
+include_once plugin_dir_path( __FILE__ ).'/libs/admin/migrations.php';
 
 load_plugin_textdomain('sendit', false, basename(dirname(__FILE__)) . '/languages'); //thanks to Davide http://www.jqueryitalia.org
 
@@ -44,7 +49,7 @@ function sendit_admin_notice() {
     {
     	if ( ! get_user_meta($user_id, 'sendit_ignore') ) {
         	echo '<div class="updated"><p>';
-        	printf(__('Your Sendit database table structure is currently updated to latest version '.SENDIT_DB_VERSION.' | <a href="%1$s">Hide this Notice</a>'), admin_url( 'admin.php?page=sendit/libs/admin.php&sendit_ignore=0'));
+        	printf(__('Your Sendit database table structure is currently updated to latest version '.SENDIT_DB_VERSION.' | <a href="%1$s">Hide this Notice</a>'), admin_url( 'admin.php?page=sendit/libs/admin/admin-core.php&sendit_ignore=0'));
         	echo "</p></div>";
     	}
     }
