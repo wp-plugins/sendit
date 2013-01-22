@@ -18,6 +18,15 @@
     background: url("images/cron.png") no-repeat scroll 50% 0;
 }
 
+.sendit_box_shop{
+    background: url("images/sendit-shop.png") no-repeat scroll 50% 0;
+}
+
+.sendit_box_template{
+    background: url("images/template.png") no-repeat scroll 50% 0;
+}
+
+
 .sendit_box_menu{
     display: block;
     text-align: center;
