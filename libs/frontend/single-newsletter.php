@@ -82,9 +82,11 @@ and switch header footer css to template post type, if not get info (header / fo
 		if(function_exists('inline_newsletter')):
 			$newsletter_content=inline_newsletter($css,$newsletter_content);
 		endif;
-		
-		echo $newsletter_content;
-		
+		//verify if analytics is installed
+
+		if(function_exists('AppendCampaignToString')):		
+			echo AppendCampaignToString($newsletter_content);
+		endif;		
 		
 		
 	endwhile;
