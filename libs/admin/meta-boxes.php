@@ -103,8 +103,8 @@ function sendit_action_box($post)
 function sendit_template_select($post)
 {
  if (is_plugin_active('sendit-pro-template-manager/sendit-pro-template-manager.php')) {
-
-$templates=extract_templates();
+	wp_reset_query();
+	$templates=extract_templates();
  ?>
 <select name="template_id" id="template_id">
 			<option value="<?php echo get_post_meta($post->ID,'template_id', true);?>" selected="selected"><?php echo get_the_title(get_post_meta($post->ID,'template_id', true));?></option>

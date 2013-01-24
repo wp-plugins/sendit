@@ -778,6 +778,10 @@ function gestisci_menu() {
 	    //plugin is activated
 	    add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'cron_settings');
 	}
+	else
+	{
+	    add_submenu_page(__FILE__, __('Cron Settings', 'sendit'), __('cron settings', 'sendit'), 8, 'cron-settings', 'buy_plugin_page');	
+	}
 	
 	/*1.5.7 export addon*/
 	if (function_exists('sendit_csv_export')) 
@@ -792,11 +796,11 @@ function gestisci_menu() {
 	/*2.1.1 template addon*/
 	if (is_plugin_active('sendit-pro-template-manager/sendit-pro-template-manager.php')) 
 	{
-		add_submenu_page(__FILE__, __('Import template from lists', 'sendit'), __('Newsletter template', 'sendit'), 8, 'sendit_pro_template', 'sendit_pro_template_screen');
+		add_submenu_page(__FILE__, __('Email Templates', 'sendit'), __('Newsletter template', 'sendit'), 8, 'sendit_pro_template', 'sendit_pro_template_screen');
 	}
 	else
 	{
-		add_submenu_page(__FILE__, __('Import template from lists', 'sendit'), __('Newsletter template', 'sendit'), 8, 'sendit_pro_template', 'template_manager_screen');
+		add_submenu_page(__FILE__, __('Email Templates', 'sendit'), __('Newsletter template', 'sendit'), 8, 'sendit_pro_template', 'template_manager_screen');
 	}
 	
 	
@@ -862,41 +866,46 @@ $pro_plugins = array(
         		
         		array('Sendit Pro Scheduler',
         			  'sendit-scheduler/sendit-cron.php',
-        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/?panel_from_domain='.$siteurl,
         			  'Essential add plugin for mailing list with more than 500/1000 email recipients to avoid spam and help
         			  newsletter delivery scheduling the Job and Tracking newsletter',
-        			  $file_dir.'images/scheduler-90x90.jpg'
+        			  $file_dir.'images/scheduler-90x90.jpg',
+        			  '20'
         			  ),
 
 
     			array('Sendit Pro Template Manager',
         			  'sendit-pro-template-manager/sendit-pro-template-manager.php',
-        			  'http://sendit.wordpressplanet.org/sendit-pro-template-manager/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-template-manager/?panel_from_domain='.$siteurl,
         			  'Want more for your Email Design? Would you like to preview your newsletter? Try now the new Template Manager for email templates and download the 3 scaffolding sample templates',
-        			  $file_dir.'images/template-90x90.png'
+        			  $file_dir.'images/template-90x90.png',
+        			  '10'
         			  ),
         			  
         			  
         		array('Sendit Pro Css Inliner',
         			  'sendit-css-inliner/sendit-pro-css-inliner.php',
-        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/?panel_from_domain='.$siteurl,
         			  'Let your reader see the same email! No more timeless Inline css coding, let Sendit Pro Css inliner do for you',
-        			  $file_dir.'images/css_inliner-90x90.png'
+        			  $file_dir.'images/css_inliner-90x90.png',
+        			  '5'
         			  ),
         			  
         		array('Sendit Pro More Fields',
         			  'sendit-morefields/sendit-morefields.php',
-        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-more-fields/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-more-fields/?panel_from_domain='.$siteurl,
         			  'Add Informations field to your widget form simply drag and drop fields (name,city etc)',
-        			  $file_dir.'images/morefields-90x90.jpg'
+        			  $file_dir.'images/morefields-90x90.jpg',
+        			  '5'
         			  ),
 
 
         		array('Sendit Pro Export to CsV',
         			  'sendit-export/sendit-export.php',
-        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-csv-list-exporter/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-csv-list-exporter/?panel_from_domain='.$siteurl,
         			  'Need to export your mailing list for personal purpose or to change plugin? :( Feel free to do it with this tool!',
-        			  $file_dir.'images/senditcsv-90x90.jpg'
+        			  $file_dir.'images/senditcsv-90x90.jpg',
+        			  '5'
         			  ),
 
 
@@ -904,10 +913,21 @@ $pro_plugins = array(
 
         		array('Sendit Pro Analytics Campaign tracker',
         			  'sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php',
-        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-auto-css-inliner/?panel_from_domain='.$siteurl,
         			  'Track your newsletter campaign by tracking visitors from newsletter with Google Analytics Integration',
-        			  $file_dir.'images/scheduler-90x90.jpg'
+        			  $file_dir.'images/scheduler-90x90.jpg',
+        			  '5'
+        			  ),
+
+        		array('Sendit Premium All in One',
+        			  'sendit-premium/sendit-premium-activator.php',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-premium/?panel_from_domain='.$siteurl,
+        			  'This is the full Sendit Premium Package at special price of &euro; 35 (save up to 15 &euro;)',
+        			  $file_dir.'images/allinone-90x90.png',
+        			  '35'
         			  )
+
+
         			  
         		);
 						 
@@ -1231,13 +1251,14 @@ case 'plugin_check_list':
 <h2>Sendit Control Panel</h2>
 
 
-<p>This is your checkpoint where you can active and buy additionals plugin to your Sendit Free Installation</p>
+<p><i>This is your checkpoint where you can activate and buy additional pro plugins to your Sendit Free Installation</i></p>
 	<table>
 		<thead>	
 			<tr>
 				<th>Plugin</th>
-				<th>Plugin Name</th>
+				<th>Name</th>
 				<th>Description</th>
+				<th>Price</th>
 				<th>Status</th>
 			</tr>
 		</thead>
@@ -1251,12 +1272,14 @@ case 'plugin_check_list':
 	 if (is_plugin_active($plugin[1])) {
 	     echo '<tr><td><img class="pluginthumb" width="60" src="'.$plugin[4].'" alt="'.$plugin[0].'"/></td>
 	     			<td><a href="'.$plugin[2].'">'.$plugin[0].'</a></td>
+	     			<td class="plugin_on"><strong>&euro; '.$plugin[5].'</strong></td>
 	     			<td class="plugin_on"><small>'.$plugin[3].'</small></td>
-	     			<td class="plugin_on"> ACTIVE </td></tr>';
+	     			<td class="plugin_on"> <strong>ACTIVE</strong> </td></tr>';
 	   }
 	  else {
 	  	 echo '<tr><td><img class="pluginthumb" width="60" src="'.$plugin[4].'" alt="'.$plugin[0].'"/></td>
 	  	 			<td><a href="'.$plugin[2].'">'.$plugin[0].'</a></td>
+	     			<td class="plugin_on"><strong>&euro; '.$plugin[5].'</strong></td>
 	  	 			<td><small>'.$plugin[3].'</small></td>
 	  	 			<td class="plugin_off"><a class="button-primary" href="'.$plugin[2].'">buy now ' .$plugin[0].'</a></td></tr>';
 	    }
@@ -1356,12 +1379,12 @@ $i++;
 </form>
 <form method="post">
 <p class="submit">
-<input name="reset" type="submit" value="Reset" />
+<input name="reset" class="button-primary" type="submit" value="Reset" />
 <input type="hidden" name="action" value="reset" />
 </p>
 </form>
-<div style="font-size:9px; margin-bottom:10px;">Icons: <a href="http://www.woothemes.com/2009/09/woofunction/">WooFunction</a></div>
- </div> 
+
+</div> 
  
 
 <?php
@@ -1371,7 +1394,7 @@ $i++;
 add_action('admin_init', 'senditpanel_add_init');
 add_action('admin_menu', 'senditpanel_add_admin');
 
-function buy_plugin($plugin)
+function buy_plugin()
 { ?>
 <div id="premium-panel">
 	<span class="main">You don't have Sendit Pro Scheduler installed</span>
@@ -1379,4 +1402,15 @@ function buy_plugin($plugin)
 </div>
 <? }
 
+
+function buy_plugin_page()
+{ ?>
+<div class="wrap">
+<h2>Sendit Pro Scheduler...</h2>
+	<div id="premium-panel">
+		<span class="main">Ops! You don't have Sendit Pro Scheduler installed or maybe you forgot to activate!</span>
+	<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org">Buy Now</a></span>
+	</div>
+</div>
+<? }
 ?>
