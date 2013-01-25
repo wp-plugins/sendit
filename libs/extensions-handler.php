@@ -82,7 +82,7 @@ add_filter( 'gettext', 'sendit_change_publish_button', 10, 2 );
 function sendit_change_publish_button( $translation, $text ) {
 if ( 'newsletter' == get_post_type())
 if ( $text == 'Publish' || $text == 'Update')
-    return 'Save or Send Newsletter';
+    return 'Send Newsletter';
 
 return $translation;
 }
@@ -150,7 +150,9 @@ function send_newsletter($post_ID)
 		$title = $newsletter->post_title;
 		//echo 'template id '.$template_id;
 		
-		$css=get_post_meta($template_id,'newsletter_css', true);
+
+
+		
 		$header=get_post_meta($template_id,'headerhtml', true);
 		$header=str_replace('[style]','<style>'.$css.'</style>',$header);
 			if ( has_post_thumbnail($template_id) ) {
@@ -183,10 +185,26 @@ function send_newsletter($post_ID)
 	get_option('blog_charset') . "\"\n";
 	/*+++++++++++++++++++ CONTENT EMAIL +++++++++++++++++++++++++++++++++++++++++*/
 	$title = $article->post_title;
-	$content = apply_filters('the_content',$article->post_content);
-
 	
-	$newsletter_content=$header.$content.$footer;
+	//$content = apply_filters('the_content',$article->post_content);
+	$content= $article->post_content;
+	
+	//$newsletter_content=$header.$content.$footer;
+	//new 2.1.2 content is already with footer and header
+	$newsletter_content=$content;
+	
+	
+	
+	//CSS get template id comment tag parse and extract css.... v 2.2.2
+		
+	$get_template_id=getStylesheet($newsletter_content);
+		
+	$css_id=$get_template_id[1][0];
+
+	$css=get_post_meta($css_id,'newsletter_css', true);
+	
+	
+	
 	$readonline = get_permalink($post_ID);
 
 	if($send_now==1):
@@ -209,6 +227,11 @@ function send_newsletter($post_ID)
 			if(is_plugin_active('sendit-css-inliner/sendit-pro-css-inliner.php')):
 				$newsletter_content=inline_newsletter($css,$newsletter_content.$delete_link);
 			endif;
+			
+			if(is_plugin_active('sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php')):		
+				$newsletter_content=AppendCampaignToString($newsletter_content);
+			endif;		
+		
 			
 			wp_mail($subscriber->email, $title ,$newsletter_content, $headers, $attachments);		
 		endforeach;
@@ -471,5 +494,13 @@ function sendit_templates() {
 		</div>
 		</div>	
 <?php }
+
+
+
+function getStylesheet($content) {
+	
+	preg_match_all("~\[template_id=(\d+)\]~i", $content, $matches);
+	return $matches;
+}
 
 ?>

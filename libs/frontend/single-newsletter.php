@@ -4,13 +4,9 @@ It will recognize automatically presence of Sendit Pro Template Manager
 and switch header footer css to template post type, if not get info (header / footer / css ) from the list_details
 */
 
+$sendit = new Actions();
 
-
-	$sendit = new Actions();
-
-
-
-	?>
+?>
 <?php if (have_posts()) : 
 	while (have_posts()) : the_post(); 
 	$template_id= get_post_meta($post->ID, 'template_id', TRUE); 
@@ -29,7 +25,10 @@ and switch header footer css to template post type, if not get info (header / fo
 	
 
 		$template_id= get_post_meta($post->ID, 'template_id', TRUE);    		
-	$css=get_post_meta($template_id, 'newsletter_css', TRUE); 
+		$css=get_post_meta($template_id, 'newsletter_css', TRUE); 
+		
+		
+	
 
 		$header=get_post_meta($template_id, 'headerhtml', TRUE);
      	$box_styles='.info, .success, .warning, .error, .validation {
@@ -72,12 +71,20 @@ and switch header footer css to template post type, if not get info (header / fo
 
 	endif; //plugin is active
 
-		$newsletter_content=$header.get_the_content().$footer;
+		//$newsletter_content=$header.get_the_content().$footer;
 
- 		if(function_exists('inline_newsletter')):    ?>		
-     	<? endif; 
-
+		$newsletter_content=get_the_content();
 		
+		//CSS get template id comment tag parse and extract css....
+		
+		$get_template_id=getStylesheet($newsletter_content);
+		
+		$css_id=$get_template_id[1][0];
+
+		$css=get_post_meta($css_id,'newsletter_css', true);
+		
+
+
 		//verify if inliner is installed
 		if(function_exists('inline_newsletter')):
 			$newsletter_content=inline_newsletter($css,$newsletter_content);
