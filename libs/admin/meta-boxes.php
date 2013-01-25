@@ -48,7 +48,16 @@ function sendit_empty_check() {
 
 function extract_posts()
 {
-	$posts=get_posts();
+	/*
+	Todo post type management
+	*/
+	$args=array('posts_per_page'  => 15,
+    'offset'          => 0,
+    'orderby'         => 'post_type',
+    'order'           => 'DESC',
+    'post_type'       => array('post','product'),
+    'post_status'     => 'publish');
+	$posts=get_posts($args);
 	return $posts;
 }
 
@@ -70,17 +79,26 @@ function sendit_add_custom_box()
 {
   if( function_exists( 'add_meta_box' ))
   {
-	//template metabox header and footer
 
-	// sendit 3---- add_meta_box( 'action_html', __( 'Action', 'sendit' ),'sendit_action_box', 'newsletter', 'side','high' );
+	
+	add_meta_box( 'help_html', __( 'Guideline', 'sendit' ),'sendit_help_box', 'newsletter', 'side','high' );
+	
+
+
+	//template choice from newsletter
+	add_meta_box( 'template_choice', __( 'Select template for newsletter', 'sendit' ),'sendit_push_template', 'newsletter', 'side','high' );
+
 
 	add_meta_box( 'action_html', __( 'Action', 'sendit' ),'sendit_custom_box', 'newsletter', 'side','high' );
 
-	add_meta_box( 'template_html', __( 'Edit newsletter template', 'sendit' ),'sendit_html_box', 'sendit_template', 'advanced','high' );
+	add_meta_box( 'template_html', __( 'Edit newsletter template', 'sendit' ),'sendit_html_box', 'sendit_template', 'advanced','default' );
 	//content choice send element to editor
 	add_meta_box( 'content_choice', __( 'Append content from existing posts', 'sendit' ),'sendit_content_box', 'newsletter', 'advanced','high' );
 	//template choice from newsletter
-	add_meta_box( 'template_choice', __( 'Select template for newsletter', 'sendit' ),'sendit_template_select', 'newsletter', 'side','high' );
+	
+	//add_meta_box( 'template_choice', __( 'Select template for newsletter', 'sendit' ),'sendit_template_select', 'newsletter', 'side','high' );
+
+
     
    } 
 }
@@ -161,10 +179,81 @@ function sendit_html_box($post)
 
 
 
+function sendit_push_template($post) {
+
+	/*
+	new: template push 
+	*/
+		
+	wp_reset_query();	
+	$templates=extract_templates();
+
+	foreach($templates as $template): ?>
+	<div class="post_box">
+	<table>
+		<tr>
+			<th style="width:200px; text-align:left;"><?php echo $template->post_title; ?></th><td><a class="button-primary send_to_editor">Apply Template &raquo;</a></td>
+		</tr>
+	</table>
+    	<div class="content_to_send" style="display:none;">
+    		<!-- [template_id=<?php echo $template->ID ?>] -->
+    		<?php 
+    		$css=get_post_meta($template->ID, 'newsletter_css', TRUE);
+			$header=get_post_meta($template->ID, 'headerhtml', TRUE);
+			//parse header shortcode...
+			$header=str_replace('[style]','<style>'.$css.'</style>',$header);
+			
+			//logo
+			if ( has_post_thumbnail($template->ID) ) {
+				$header_image=get_the_post_thumbnail($template->ID);
+				}
+			else {
+				$header_image='<img alt="" src="http://placehold.it/300x50/" />';
+			}
+			
+			
+			$header=str_replace('[logo]',$header_image,$header);
+			$header=str_replace('[homeurl]',get_bloginfo('siteurl'),$header);
+			$footer=get_post_meta($template->ID, 'footerhtml', TRUE); 
+			//build template scaffold
+			echo $header;
+			echo '<h2>'.__('Good Luck!','sendit').'</h2>';
+			echo '<p>'.__(' Start from here to edit your content').'</p>';
+			echo $footer;
+			?>
+    	</div>
+	</div>
+	<?php endforeach; 
+	
+}
+
+
+function sendit_help_box()
+{
+	?>
+<h5><?php _e('Step by Step guide','sendit'); ?></h5>
+	<ol>
+		<li><?php _e('Select template for your newsletter (must have Sendit template manager, if not skip to 2)','sendit'); ?></li>
+		<li><?php _e('Edit your content or append exixting one from the box below. It automatically add articles with featured images in the wysisyg editor','sendit'); ?></li>
+		<li><?php _e('Choose mailing list if you want to send','sendit'); ?></li>
+		<li><?php _e('Decide what to do! Save a draft, send instantly with free mode or schedule if you have Sendit Pro Scheduler activated','sendit'); ?></li>
+		<li><?php _e('If sendit Scheduler is activated from newsletter panel you will have stats in realtime to see who open your email','sendit'); ?></li>
+
+	</ol>
+<div id="sendit-banner">
+	<span class="main">Limited offer</span>
+	<span><?php _e('Get Sendit Premium Suite (6 plugins) for 35 &euro; and save 15 &euro; now','sendit'); ?></span>
+</div>
+	<? 
+}
+
+
 function sendit_content_box($post) {
 
-
-
+	/*
+	TO DO: Readmore customizing 
+	*/
+	
 	global $post;
 	$posts=extract_posts();
 	foreach($posts as $post): ?>
@@ -175,13 +264,14 @@ function sendit_content_box($post) {
 		</tr>
 	</table>
     	<div class="content_to_send" style="display:none;">
-    		<div class="sendit_article" style="clear:both; display:block;"><h3><a href="<?php echo get_permalink( $post->ID); ?>"><?php echo $post->post_title; ?></a></h3>
+    		<div class="sendit_article" style="clear:both; display:block;">
+    		<h3><a href="<?php echo get_permalink( $post->ID); ?>"><?php echo $post->post_title; ?></a></h3>
 		    		<?php if ( has_post_thumbnail() ) {
 		    			$attr = array('class'	=> "alignleft");
 						the_post_thumbnail('thumbnail',$attr);
 				}?>
     		<?php echo apply_filters('the_excerpt',$post->post_content); ?><br />
-    		<div class="sendit_readmore" style="clear:both; display:block;"><a class="sendit_readmore" href="<?php echo get_permalink($post->ID); ?>">Read more...</a></div>
+    		<div class="sendit_readmore" style="clear:both; display:block;"><a href="<?php echo get_permalink($post->ID); ?>"  class="sendit_more_button">view more</a></div>
 
     		</div>
     	</div>

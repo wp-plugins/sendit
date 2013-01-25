@@ -17,5 +17,16 @@
 				}
 				
 			jQuery(this).parent().next('.rm_options').slideToggle('slow');	
+			
+			
+			// place meta box before standard post edit field
+
+    
+                jQuery('#template_choice').insertBefore('#titlewrap');
+ 
+			
+			
+			
+			
 		});
 });
