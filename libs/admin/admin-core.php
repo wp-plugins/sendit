@@ -1151,7 +1151,7 @@ function senditpanel_add_init() {
 $siteurl = get_option('siteurl');
 $file_dir = $siteurl . '/wp-content/plugins/sendit/';
 wp_enqueue_style("functions", $file_dir."functions.css", false, "1.0", "all");
-wp_enqueue_script("rm_script", $file_dir."rm_script.js", false, "1.0");
+wp_enqueue_script("sendit_app", $file_dir."sendit_app.js", false, "1.0");
 
 }
 

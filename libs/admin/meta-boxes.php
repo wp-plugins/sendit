@@ -233,16 +233,18 @@ function sendit_help_box()
 	?>
 <h5><?php _e('Step by Step guide','sendit'); ?></h5>
 	<ol>
-		<li><?php _e('Select template for your newsletter (must have Sendit template manager, if not skip to 2)','sendit'); ?></li>
-		<li><?php _e('Edit your content or append exixting one from the box below. It automatically add articles with featured images in the wysisyg editor','sendit'); ?></li>
-		<li><?php _e('Choose mailing list if you want to send','sendit'); ?></li>
-		<li><?php _e('Decide what to do! Save a draft, send instantly with free mode or schedule if you have Sendit Pro Scheduler activated','sendit'); ?></li>
-		<li><?php _e('If sendit Scheduler is activated from newsletter panel you will have stats in realtime to see who open your email','sendit'); ?></li>
+		<li><?php _e('<a class="scroll" href="#template_choice"><b>Select template</b></a> for your newsletter (must have Sendit template manager, if not skip to 2)','sendit'); ?></li>
+		<li><?php _e('<a class="scroll" href="#title"><b>Edit newsletter subject</b></a>'); ?></li>
+		<li><?php _e('<a class="scroll" href="#wp-content-editor-container"><b>Edit</b></a> your email content or <a class="scroll" href="#content_choice"><b>adds articles</b></a> directly from your blog posts archive</a>. It automatically adds articles with featured images in the HTML editor','sendit'); ?></li>
+		<li><?php _e('<a class="scroll" href="#action_html"><b>Select</a></b> mailing list if you want to send out the email','sendit'); ?></li>
+		<li><?php _e('<a class="scroll" href="#submitdiv"><b>Decide</b></a> what to do! Save a draft, send instantly with free mode or schedule if you have <a href="http://sendit.wordpressplanet.org/?panel_from_domain='.get_bloginfo('siteurl').'">Sendit Pro Scheduler</a> activated','sendit'); ?></li>
+		<li><?php _e('If sendit pro Scheduler is activated from newsletter panel you will have stats in realtime to see who opens your email','sendit'); ?></li>
+
 
 	</ol>
 <div id="sendit-banner">
 	<span class="main">Limited offer</span>
-	<span><?php _e('Get Sendit Premium Suite (6 plugins) for 35 &euro; and save 15 &euro; now','sendit'); ?></span>
+	<span><a href="http://sendit.wordpressplanet.org/?panel_from_domain=<?php get_bloginfo('siteurl'); ?>"><?php _e('Get Sendit Premium Suite (6 plugins) for 35 &euro; and save 15 &euro; now','sendit'); ?></a></span>
 </div>
 	<? 
 }
