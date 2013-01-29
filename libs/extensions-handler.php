@@ -225,7 +225,7 @@ function send_newsletter($post_ID)
 			
 			//verify if inliner is installed
 			if(is_plugin_active('sendit-css-inliner/sendit-pro-css-inliner.php')):
-				$newsletter_content=inline_newsletter($css,$newsletter_content.$delete_link);
+				$newsletter_content=inline_newsletter($css,$newsletter_content);
 			endif;
 			
 			if(is_plugin_active('sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php')):		
@@ -233,7 +233,7 @@ function send_newsletter($post_ID)
 			endif;		
 		
 			
-			wp_mail($subscriber->email, $title ,$newsletter_content, $headers, $attachments);		
+			wp_mail($subscriber->email, $title ,$newsletter_content.$delete_link, $headers, $attachments);		
 		endforeach;
 		//set to 5 status : sent with classic plugin
 		update_post_meta($post_ID, 'send_now', '5');	
