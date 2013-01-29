@@ -6,8 +6,8 @@ and switch header footer css to template post type, if not get info (header / fo
 
 $sendit = new Actions();
 
-?>
-<?php if (have_posts()) : 
+
+if (have_posts()) : 
 	while (have_posts()) : the_post(); 
 	$template_id= get_post_meta($post->ID, 'template_id', TRUE); 
 
@@ -101,4 +101,7 @@ $sendit = new Actions();
 else : ?>
      <!-- Stuff to do if there are no posts-->
 	<h2>No Newsletter</h2>
-<?php endif; ?>
+<?php endif; 
+wp_footer();
+
+?>
