@@ -274,7 +274,7 @@ function sendit_help_box()
 	<span class="main">Limited offer</span>
 	<span><a href="http://sendit.wordpressplanet.org/?panel_from_domain=<?php get_bloginfo('siteurl'); ?>"><?php _e('Get Sendit Premium Suite (6 plugins) for 35 &euro; and save 15 &euro; now','sendit'); ?></a></span>
 </div>
-	<? 
+	<?php
 }
 
 
@@ -307,7 +307,7 @@ function sendit_content_box($post) {
     	</div>
     </div>
 
-	<?php endforeach; 
+<?php endforeach; 
 	
 }
 

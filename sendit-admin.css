@@ -1,40 +1,42 @@
 /*buttons*/
 .sendit_box_list{
-    background: url("images/lists.png") no-repeat scroll 50% 0;
+    background: #fff url("images/lists.png") no-repeat scroll 50% 0;
 }
 .sendit_box_design{
-    background: url("images/widget.png") no-repeat scroll  50% 0;
+    background: #fff url("images/widget.png") no-repeat scroll  50% 0;
 }
 .sendit_box_sendnewsletter{
-    background: url("images/sendnewsletter.png") no-repeat scroll 50% 0;
+    background: #fff url("images/sendnewsletter.png") no-repeat scroll 50% 0;
 }
 .sendit_box_fields{
-    background: url("images/morefields.png") no-repeat scroll 50% 0;
+    background: #fff url("images/morefields.png") no-repeat scroll 50% 0;
 }
 .sendit_box_export{
-    background: url("images/export.png") no-repeat scroll 50% 0;
+    background: #fff url("images/export.png") no-repeat scroll 50% 0;
 }
 .sendit_box_cron{
-    background: url("images/cron.png") no-repeat scroll 50% 0;
+    background: #fff url("images/cron.png") no-repeat scroll 50% 0;
 }
 
 .sendit_box_shop{
-    background: url("images/sendit-shop.png") no-repeat scroll 50% 0;
+    background: #fff url("images/sendit-shop.png") no-repeat scroll 50% 0;
 }
 
 .sendit_box_template{
-    background: url("images/template.png") no-repeat scroll 50% 0;
+    background: #fff url("images/template.png") no-repeat scroll 50% 0;
 }
 
 
 .sendit_box_menu{
     display: block;
+
     text-align: center;
     height: 200px;
     width:30%;
     float:left;
     border-radius:5px;
     margin-right: 5px;
+    margin-bottom: 20px;
     padding:0 10px 0px 10px;;
 }
 
