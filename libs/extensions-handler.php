@@ -251,7 +251,7 @@ function export_subscribers_screen()
 		<a class="button primary" href="http://sendit.wordpressplanet.org/plugin-shop/wordpress-plugin/sendit-pro-csv-list-exporter/"><?php echo __('Buy this plugin Now for 5 euros', 'Sendit'); ?></a>
 	
 	</div>
-<? }
+<?php }
 
 
 function template_manager_screen()
@@ -270,14 +270,14 @@ function template_manager_screen()
 		
 		<hr />
 	
-<?php Sendit_templates(); ?>		
+<?php if(function_exists(Sendit_templates)) Sendit_templates(); ?>		
 		
 
 	
 
 	
 	</div>
-<? }
+<?php }
 
 function sendit_morefields_screen()
 { ?>
@@ -292,7 +292,7 @@ function sendit_morefields_screen()
 		<?php echo __('Buy Now for 5 &euro;', 'Sendit'); ?></a>
 	
 	</div>
-<? }
+<?php }
 
 
 

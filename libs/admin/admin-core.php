@@ -763,7 +763,9 @@ function gestisci_menu() {
  
 
     add_submenu_page(__FILE__, __('SMTP settings', 'sendit'), __('SMTP settings', 'sendit'), 8, 'sendit_smtp_settings', 'SmtpSettings');  
-    
+  
+    add_submenu_page(__FILE__, __('Test email', 'sendit'), __('Test email', 'sendit'), 8, 'sendit_test_email', 'sendit_test_email');  
+
     add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from comments', 'sendit'), 8, 'mass-import', 'ImportWpComments');
     
     
@@ -815,6 +817,49 @@ function gestisci_menu() {
    
    
        
+
+}
+
+function sendit_test_email() {
+
+  if (!current_user_can('manage_options'))  {
+    wp_die( __('You do not have sufficient permissions to access this page.') );
+  }
+
+  $markup= '<div class="wrap">';
+  $markup.= '<div id="icon-options-general" class="icon32"><br /></div>';
+  $markup.= '<h2>'.__('Email Testing').'</h2>';
+
+
+    $headers= "MIME-Version: 1.0\n" .
+        "From: ".get_option('admin_email')." <".get_option('admin_email').">\n" .
+            "Content-Type: text/html; charset=\"" .
+    get_option('blog_charset') . "\"\n";
+   // $phpmailer->SMTPDebug = 2;  
+    if($_GET['test_send']==1):
+        $inviata=wp_mail($_GET['test_email'], 'test smtp with Wordpress Sendit Pro Scheduler','testing smtp', $headers);
+        $markup.='<div id="message" class="updated fade"><p><strong>'.__('Email Test Sent!', 'sendit').'</strong></p></div>';
+
+    endif;
+    
+    //var_dump($phpmailer);
+    //var_dump($inviata);
+
+
+        $markup.='<form action="" method="get"><h3>Send test email</h3>
+            <label for="test_email">Email to:</label>
+            <input type="text" name="test_email">
+            <input type="hidden" name="test_send" value="1">
+            <input type="hidden" name="page" value="sendit_test_email">
+            
+            <input type="submit" name="submit" class="button-primary" value="'.__('Send Test email', 'sendit').'" />
+            
+
+        </form>';
+
+    $markup.='</div>';
+
+    echo $markup;
 
 }
 
@@ -1120,10 +1165,11 @@ $options=options_array();
 global $themename, $shortname;
  
 if ( $_GET['page'] == 'sendit_general_settings' ) {
- 
+
 	if ( 'save' == $_REQUEST['action'] ) {
- 		
+ 		//print_r($_POST);
 		foreach ($options as $value) {
+		//print_r($value);
 		update_option( $value['id'], $_REQUEST[ $value['id'] ] ); }
  
 foreach ($options as $value) {
@@ -1364,7 +1410,7 @@ $i++;
 ?>
 
 <div class="rm_section">
-<div class="rm_title"><h3><img src="<?php echo $file_dir; ?>images/trans.gif" class="inactive" alt="""><?php echo $value['name']; ?></h3><span class="submit"><input class="button-primary" name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+<div class="rm_title"><h3><img src="<?php echo $file_dir; ?>images/trans.png" class="inactive" alt="""><?php echo $value['name']; ?></h3><span class="submit"><input type="hidden" name="action" value="save" /><input class="button-primary" name="save<?php echo $i; ?>" type="submit" value="Save changes" />
 </span><div class="clearfix"></div></div>
 <div class="rm_options">
 
@@ -1375,7 +1421,7 @@ $i++;
 }
 ?>
  
-<input type="hidden" name="action" value="save" />
+
 </form>
 <form method="post">
 <p class="submit">
@@ -1400,7 +1446,7 @@ function buy_plugin()
 	<span class="main">You don't have Sendit Pro Scheduler installed</span>
 <span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org">Buy Now</a></span>
 </div>
-<? }
+<?php }
 
 
 function buy_plugin_page()
@@ -1412,5 +1458,5 @@ function buy_plugin_page()
 	<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org">Buy Now</a></span>
 	</div>
 </div>
-<? }
+<?php }
 ?>

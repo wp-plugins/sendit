@@ -66,11 +66,11 @@ and switch header footer css to template post type, if not get info (header / fo
      		
  		if(function_exists('inline_newsletter')):    ?>		
      		<div class="info">This preview is generated and parsed by Sendit Pro Inliner tool with all styles converted into inline.</div>
-     	<? else: ?>
+     	<?php else: ?>
      		<div class="warning"><h4>Buy Sendit Pro auto inliner tool</h4>
      		<p>Sendit Pro auto inliner tool will parse the HTML and convert all styles into inline styles.</p>
      		</div>     	
-     	<? endif; ?>	
+     	<?php endif; ?>	
 		<?php 
 		$template_content=$header.$dummy_content.$footer;
 		
