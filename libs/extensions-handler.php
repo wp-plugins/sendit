@@ -44,6 +44,22 @@ function sendit_custom_post_type_init()
 
 }
 
+
+add_action('admin_init', 'disable_revisions');
+function disable_revisions(){
+    remove_post_type_support('newsletter', 'revisions');
+}
+
+add_action('admin_print_scripts', 'disable_autosave');
+function disable_autosave(){
+    global $post;
+    if(get_post_type($post->ID) === 'newsletter'){
+        wp_deregister_script('autosave');
+    }
+}
+
+
+
 add_filter('post_updated_messages', 'newsletter_updated_messages');
 function newsletter_updated_messages( $messages ) {
 	global $_POST;
@@ -142,7 +158,7 @@ function send_newsletter($post_ID)
 	$header=$list_detail->header;
 	$footer=$list_detail->footer;
 	$css='';
-	
+	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	if(is_plugin_active('sendit-pro-template-manager/sendit-pro-template-manager.php')):
 		//custom post type template	
 		$template_id=get_post_meta($post_ID,'template_id', true);
