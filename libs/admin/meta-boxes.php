@@ -339,6 +339,11 @@ function sendit_save_postdata( $post_id )
 		if($_POST['newsletter_status']=='send now'):
 			send_newsletter($post_ID);
 		endif;
+
+
+		if($_POST['send_now']=='2'):
+			wp_schedule_single_event( time() + 60, 'sendit_newsletter_scheduled' );
+		endif;
 		
 		//echo $_POST['newsletter_status'];
 		update_post_meta($post_id, 'template_id',$_POST['template_id']);

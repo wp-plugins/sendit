@@ -178,12 +178,15 @@ function SmtpSettings()
         update_option('sendit_smtp_username',$_POST['sendit_smtp_username']);
         update_option('sendit_smtp_password',$_POST['sendit_smtp_password']);
         update_option('sendit_smtp_ssl',$_POST['sendit_smtp_ssl']);
-        
+       
         //new from 1.5.0!!!
         update_option('sendit_sleep_time',$_POST['sendit_sleep_time']);
         update_option('sendit_sleep_each',$_POST['sendit_sleep_each']);
+		//new from 2.2.8
+		update_option('sendit_smtp_debug',$_POST['sendit_smtp_debug']);        
         
-
+        
+        $selected_debug=get_option('sendit_smtp_debug');
         
         $markup.='<div id="message" class="updated fade"><p><strong>'.__('Settings saved!', 'sendit').'</strong></p></div>';
     endif;
@@ -192,12 +195,24 @@ function SmtpSettings()
 <form method="post" action="'.$_SERVER[REQUEST_URI].'">
 <table class="form-table">
     <tr>
-        <th><label for="sendit_smtp_host">SMTP host</label></th>
+        <th><label for="sendit_smtp_debug">'.__('Display Debug informations', 'sendit').'?</label></th>
+        <td>
+           	<select name="sendit_smtp_debug" id="sendit_smtp_ssl">
+        		<option value="'.get_option('sendit_smtp_debug').'" selected="selected" />'.get_option('sendit_smtp_debug').'</option>
+        		<option value="0">0</option>
+        		<option value="1">1</option>
+        		<option value="2">2</option>
+			</select>
+        </td>
+    </tr>
+
+    <tr>
+        <th><label for="sendit_smtp_host">'.__('SMTP host', 'sendit').'<br />('.__('Need One', 'sendit').'? <a href="http://www.sendit.smtp.com">'.__('Try Sendit SMTP', 'sendit').')</a></label></th>
         <td><input name="sendit_smtp_host" id="sendit_smtp_host" type="text" value="'.get_option('sendit_smtp_host').'" class="regular-text code" /></td>
     </tr>
 
     <tr>
-        <th><label for="sendit_smtp_port">SMTP port</label></th>
+        <th><label for="sendit_smtp_port">'.__('SMTP port', 'sendit').'</label></th>
         <td><input name="sendit_smtp_port" id="sendit_smtp_hostname" type="text" value="'.get_option('sendit_smtp_port').'" class="regular-text code" /></td>
     </tr>
     <tr>
@@ -206,11 +221,11 @@ function SmtpSettings()
         </th>
     </tr>    
     <tr>
-        <th><label for="sendit_smtp_username">SMTP username</label></th>
+        <th><label for="sendit_smtp_username">'.__('SMTP username', 'sendit').'</label></th>
         <td><input name="sendit_smtp_username" id="sendit_smtp_username" type="text" value="'.get_option('sendit_smtp_username').'" class="regular-text code" /></td>
     </tr>
     <tr>
-        <th><label for="sendit_smtp_password">SMTP password</label></th>
+        <th><label for="sendit_smtp_password">'.__('SMTP password', 'sendit').'</label></th>
         <td><input name="sendit_smtp_password" id="sendit_smtp_password" type="password" value="'.get_option('sendit_smtp_password').'" class="regular-text code" /></td>
     </tr>
     <tr>
@@ -829,24 +844,9 @@ function sendit_test_email() {
   $markup= '<div class="wrap">';
   $markup.= '<div id="icon-options-general" class="icon32"><br /></div>';
   $markup.= '<h2>'.__('Email Testing').'</h2>';
-
-
-    $headers= "MIME-Version: 1.0\n" .
-        "From: ".get_option('admin_email')." <".get_option('admin_email').">\n" .
-            "Content-Type: text/html; charset=\"" .
-    get_option('blog_charset') . "\"\n";
-   // $phpmailer->SMTPDebug = 2;  
-    if($_GET['test_send']==1):
-        $inviata=wp_mail($_GET['test_email'], 'test smtp with Wordpress Sendit Pro Scheduler','testing smtp', $headers);
-        $markup.='<div id="message" class="updated fade"><p><strong>'.__('Email Test Sent!', 'sendit').'</strong></p></div>';
-
-    endif;
-    
-    //var_dump($phpmailer);
-    //var_dump($inviata);
-
-
-        $markup.='<form action="" method="get"><h3>Send test email</h3>
+  $markup.='<div class="" id="sendit-banner">
+	<span class="main">Send test email</span>
+	<span><form action="" method="get">
             <label for="test_email">Email to:</label>
             <input type="text" name="test_email">
             <input type="hidden" name="test_send" value="1">
@@ -855,9 +855,44 @@ function sendit_test_email() {
             <input type="submit" name="submit" class="button-primary" value="'.__('Send Test email', 'sendit').'" />
             
 
-        </form>';
+        </form></span>
+	
+	
+</div>';
+  $markup.= '<p>'.__('Send to yourself an email to check if your configuration is ok. Just type your email address, send and check').'</p>';
 
+    $headers= "MIME-Version: 1.0\n" .
+        "From: ".get_option('admin_email')." <".get_option('admin_email').">\n" .
+            "Content-Type: text/html; charset=\"" .
+    get_option('blog_charset') . "\"\n";
+   // $phpmailer->SMTPDebug = 2;  
+    if($_GET['test_send']==1):
+        $inviata=wp_mail($_GET['test_email'], 'Sendit '.SENDIT_VERSION.' test email: '.get_bloginfo('name'),'testing smtp', $headers);
+        $markup.='<div id="message" class="updated fade"><p><strong>'.__('Email Test Sent!', 'sendit').'</strong></p></div>';
+
+    endif;
+    
+    //var_dump($phpmailer);
+    //var_dump($inviata);
+
+    $markup.='<h3>Enviroment Settings</h3>';
+	$markup.='<ul>';
+	$markup.='<li>'.__('SMTP host').': <strong>'.get_option('sendit_smtp_host').'</strong></li>';
+	$markup.='<li>'.__('SMTP port').': <strong>'.get_option('sendit_smtp_port').'</strong></li>';
+	$markup.='<li>'.__('SMTP authentication').': <strong>'.get_option('sendit_smtp_authentication').'</strong></li>';
+	$markup.='<li>'.__('SMTP username').': <strong>'.get_option('sendit_smtp_username').'</strong></li>';
+	$markup.='<li>'.__('SMTP password').': <strong>'.get_option('sendit_smtp_password').'</strong></li>';
+	$markup.='<li>'.__('SMTP debug').': <strong>'.get_option('sendit_smtp_debug').'</strong></li>';
+	$markup.='</ul>';
     $markup.='</div>';
+
+    $markup.='<h3>Cron Settings</h3>';
+	$markup.='<ul>';
+	$markup.='<li>'.__('Run Tasks every').': <strong>'.get_option('sendit_interval').' seconds</strong></li>';
+	$markup.='<li>'.__('Send Blocks of').': <strong>'.get_option('sendit_email_blocks').' recipients</strong></li>';
+	$markup.='</ul>';
+    $markup.='</div>';
+
 
     echo $markup;
 
@@ -1058,22 +1093,30 @@ array( "type" => "close"),
         update_option('sendit_sleep_time',$_POST['sendit_sleep_time']);
         update_option('sendit_sleep_each',$_POST['sendit_sleep_each']);
 */
-array( "name" => "SMTP Settings",
+array( "name" => __('SMTP settings', 'sendit'),
 	"type" => "section"),
 array( "type" => "open"),
 
-array( "name" => "Smtp host",
+array( "name" => __('SMTP Host', 'sendit'),
 	"desc" => "Enter your smtp host",
 	"id" => 'sendit_smtp_host',
 	"type" => "text",
 	"std" => ""),
-	
-array( "name" => "Smtp Port",
+
+array( "name" => __('SMTP port', 'sendit'),
 	"desc" => "Enter your smtp port (es 465)",
 	"id" => 'sendit_smtp_port',
 	"type" => "text",
 	"std" => ""),
 
+
+
+array( "name" => __('SMTP display debug informations', 'sendit'),
+	"desc" => "Display debug informations",
+	"id" => 'sendit_smtp_debug',
+	"type" => "select",
+	"options"=>array('0','1','2'),
+	"std" => get_option('sendit_smtp_debug')),
 
 array( "name" => "Smtp Username",
 	"id" => 'sendit_smtp_username',
@@ -1094,7 +1137,7 @@ array( "name" => "Smtp SLL/TLS",
 	"id" => 'sendit_smtp_ssl',
 	"type" => "select",
 	"desc" => 'If SMTP requires a secure connection is required please select one. Are you on panic for large mailing lists, bad delivery (spam etc)?<br><strong>Relax!</strong>Let SendGrid handle your email delivery used with Sendit. Get 25% off any plan by clicking my link.<br><a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a><br>SendGrid helps you reach more users instead of spam folders. Click this link to get your 25% discount on your first month membership. Believe me you will be addicted!<br><a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a>',
-	"options"=>array('yes','no',''),
+	"options"=>array('','ssl','tls'),
 	"std" => ""),
 
 array( "type" => "close"),

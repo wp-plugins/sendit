@@ -355,6 +355,11 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 		echo $buymsg;
 		} else {
 				if(get_post_meta($id, 'send_now', TRUE)=='2'):
+				   if(time()>wp_next_scheduled('sendit_event')) {
+				   		//wp_clear_scheduled_hook( 'sendit_event' );
+				   		//wp_schedule_event(time()+get_option('sendit_interval'), 'sendit_send_newsletter', 'sendit_event');
+				   		//echo 'cron aggiornato';
+				   }
 					echo '<div class="jobrunning senditmessage"><p>'.__('Warning! newsletter is currently running the job','sendit').'</p></div>';
 				elseif(get_post_meta($id, 'send_now', TRUE)=='4'):
 					echo '<div class="jobdone senditmessage"><p>'.__('Newsletter Sent','sendit').'</p></div>';
@@ -437,7 +442,7 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 		else
 		{
 			if(get_post_meta($id, 'send_now', TRUE)==2):
-				echo strftime("%d/%m/%Y/ - %H:%M ",wp_next_scheduled('sendit_five_event'));
+				echo strftime("%d/%m/%Y - %H:%M ",wp_next_scheduled('sendit_event'));
 			endif;
 		}
 		
@@ -464,8 +469,10 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 			$phpmailer->Host = get_option('sendit_smtp_host');
 			// If we're using smtp auth, set the username & password SO WE USE AUTH
 			if (get_option('sendit_smtp_username')!='') {
+				//print_r($phpmailer);
 				$phpmailer->SMTPAuth = TRUE;
-				$phpmailer->SMTPSecure = 'ssl';
+				$phpmailer->SMTPSecure = get_option('sendit_smtp_ssl');
+				$phpmailer->SMTPDebug  = get_option('sendit_smtp_debug'); 
 				$phpmailer->Port = get_option('sendit_smtp_port'); 
 				$phpmailer->Username = get_option('sendit_smtp_username');
 				$phpmailer->Password = get_option('sendit_smtp_password');
