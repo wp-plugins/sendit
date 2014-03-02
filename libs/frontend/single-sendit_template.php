@@ -41,7 +41,7 @@ and switch header footer css to template post type, if not get info (header / fo
 				$header_image=get_the_post_thumbnail();
 				}
 			else {
-				$header_image='<img alt="" src="http://placehold.it/300x50/" />';
+				$header_image='<img alt="" src="http://placehold.it/600x250/" />';
 			}
 			
 			$header=str_replace('[logo]',$header_image,$header);
@@ -51,17 +51,26 @@ and switch header footer css to template post type, if not get info (header / fo
 			
 			$footer=get_post_meta($post->ID, 'footerhtml', TRUE);
 
-	  		$dummy_content='<h2>Heading text for your newsletter</h2><h3>H3 Heading and template preview</h3>
+	  		$dummy_content='<h2>Heading text for your newsletter</h2>
+	  		<h3><a href="#">Article 1</a></h3>
      		
      		
-     		<p><img alt="" src="http://placehold.it/200x200/" title="test" class="alignleft size-thumbnail wp-image-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>';
+     		<p><img alt="" src="http://placehold.it/200x200/" title="test" class="alignleft size-thumbnail wp-image-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p><div class="sendit_readmore"><a class="sendit_more_button">Read More</a></div><hr />
+     		
+     		
+     			  		<h3><a href="#">Article 2</a></h3>
+
+     		     		<p><img alt="" src="http://placehold.it/200x200/" title="test" class="alignleft size-thumbnail wp-image-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p><div class="sendit_readmore"><a class="sendit_more_button">Read More</a></div><hr />';
+     		
+     		
+     		
  		if(function_exists('inline_newsletter')):    ?>		
      		<div class="info">This preview is generated and parsed by Sendit Pro Inliner tool with all styles converted into inline.</div>
-     	<? else: ?>
+     	<?php else: ?>
      		<div class="warning"><h4>Buy Sendit Pro auto inliner tool</h4>
      		<p>Sendit Pro auto inliner tool will parse the HTML and convert all styles into inline styles.</p>
      		</div>     	
-     	<? endif; ?>	
+     	<?php endif; ?>	
 		<?php 
 		$template_content=$header.$dummy_content.$footer;
 		
@@ -75,4 +84,5 @@ and switch header footer css to template post type, if not get info (header / fo
 		
      endwhile; 
     endif;
+    wp_footer();
 ?>

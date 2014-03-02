@@ -44,6 +44,22 @@ function sendit_custom_post_type_init()
 
 }
 
+
+add_action('admin_init', 'disable_revisions');
+function disable_revisions(){
+    remove_post_type_support('newsletter', 'revisions');
+}
+
+add_action('admin_print_scripts', 'disable_autosave');
+function disable_autosave(){
+    global $post;
+    if(get_post_type($post->ID) === 'newsletter'){
+        wp_deregister_script('autosave');
+    }
+}
+
+
+
 add_filter('post_updated_messages', 'newsletter_updated_messages');
 function newsletter_updated_messages( $messages ) {
 	global $_POST;
@@ -142,7 +158,7 @@ function send_newsletter($post_ID)
 	$header=$list_detail->header;
 	$footer=$list_detail->footer;
 	$css='';
-	
+	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	if(is_plugin_active('sendit-pro-template-manager/sendit-pro-template-manager.php')):
 		//custom post type template	
 		$template_id=get_post_meta($post_ID,'template_id', true);
@@ -225,7 +241,7 @@ function send_newsletter($post_ID)
 			
 			//verify if inliner is installed
 			if(is_plugin_active('sendit-css-inliner/sendit-pro-css-inliner.php')):
-				$newsletter_content=inline_newsletter($css,$newsletter_content.$delete_link);
+				$newsletter_content=inline_newsletter($css,$newsletter_content);
 			endif;
 			
 			if(is_plugin_active('sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php')):		
@@ -233,7 +249,7 @@ function send_newsletter($post_ID)
 			endif;		
 		
 			
-			wp_mail($subscriber->email, $title ,$newsletter_content, $headers, $attachments);		
+			wp_mail($subscriber->email, $title ,$newsletter_content.$delete_link, $headers, $attachments);		
 		endforeach;
 		//set to 5 status : sent with classic plugin
 		update_post_meta($post_ID, 'send_now', '5');	
@@ -251,7 +267,7 @@ function export_subscribers_screen()
 		<a class="button primary" href="http://sendit.wordpressplanet.org/plugin-shop/wordpress-plugin/sendit-pro-csv-list-exporter/"><?php echo __('Buy this plugin Now for 5 euros', 'Sendit'); ?></a>
 	
 	</div>
-<? }
+<?php }
 
 
 function template_manager_screen()
@@ -270,14 +286,14 @@ function template_manager_screen()
 		
 		<hr />
 	
-<?php Sendit_templates(); ?>		
+<?php if(function_exists(Sendit_templates)) Sendit_templates(); ?>		
 		
 
 	
 
 	
 	</div>
-<? }
+<?php }
 
 function sendit_morefields_screen()
 { ?>
@@ -292,9 +308,112 @@ function sendit_morefields_screen()
 		<?php echo __('Buy Now for 5 &euro;', 'Sendit'); ?></a>
 	
 	</div>
-<? }
+<?php }
 
+/*
+ * Function creates post duplicate as a draft and redirects then to the edit post screen
+ */
+function sendit_duplicate_post_as_draft(){
+	global $wpdb;
+	if (! ( isset( $_GET['post']) || isset( $_POST['post'])  || ( isset($_REQUEST['action']) && 'rd_duplicate_post_as_draft' == $_REQUEST['action'] ) ) ) {
+		wp_die('No post to duplicate has been supplied!');
+	}
+ 
+	/*
+	 * get the original post id
+	 */
+	$post_id = (isset($_GET['post']) ? $_GET['post'] : $_POST['post']);
+	/*
+	 * and all the original post data then
+	 */
+	$post = get_post( $post_id );
+ 
+	/*
+	 * if you don't want current user to be the new post author,
+	 * then change next couple of lines to this: $new_post_author = $post->post_author;
+	 */
+	$current_user = wp_get_current_user();
+	$new_post_author = $current_user->ID;
+ 
+	/*
+	 * if post data exists, create the post duplicate
+	 */
+	if (isset( $post ) && $post != null) {
+ 
+		/*
+		 * new post data array
+		 */
+		$args = array(
+			'comment_status' => $post->comment_status,
+			'ping_status'    => $post->ping_status,
+			'post_author'    => $new_post_author,
+			'post_content'   => $post->post_content,
+			'post_excerpt'   => $post->post_excerpt,
+			'post_name'      => $post->post_name,
+			'post_parent'    => $post->post_parent,
+			'post_password'  => $post->post_password,
+			'post_status'    => 'draft',
+			'post_title'     => $post->post_title,
+			'post_type'      => $post->post_type,
+			'to_ping'        => $post->to_ping,
+			'menu_order'     => $post->menu_order
+		);
+ 
+		/*
+		 * insert the post by wp_insert_post() function
+		 */
+		$new_post_id = wp_insert_post( $args );
+ 
+		/*
+		 * get all current post terms ad set them to the new post draft
+		 */
+		$taxonomies = get_object_taxonomies($post->post_type); // returns array of taxonomy names for post type, ex array("category", "post_tag");
+		foreach ($taxonomies as $taxonomy) {
+			$post_terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
+			wp_set_object_terms($new_post_id, $post_terms, $taxonomy, false);
+		}
+ 
+		/*
+		 * duplicate all post meta apart from sendit custom post_meta (sendit_list, startnum, subscribers)
+		 */
+		$post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id and meta_key!='send_now' and meta_key!='subscribers' and meta_key!='startnum' and meta_key!='sendit_list'");
+		if (count($post_meta_infos)!=0) {
+			$sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
+			foreach ($post_meta_infos as $meta_info) {
+				$meta_key = $meta_info->meta_key;
+				$meta_value = addslashes($meta_info->meta_value);
+				$sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
+			}
+			$sql_query.= implode(" UNION ALL ", $sql_query_sel);
+			$wpdb->query($sql_query);
+		}
+ 
+ 
+		/*
+		 * finally, redirect to the edit post screen for the new draft
+		 */
+		wp_redirect( admin_url( 'post.php?action=edit&post=' . $new_post_id ) );
+		exit;
+	} else {
+		wp_die('Post creation failed, could not find original post: ' . $post_id);
+	}
+}
+add_action( 'admin_action_sendit_duplicate_post_as_draft', 'sendit_duplicate_post_as_draft' );
+ 
+/*
+ * Add the duplicate link to action list for post_row_actions except post values for sendit useful for testing
+ */
+function sendit_duplicate_post_link( $actions, $post ) {
+	if (current_user_can('edit_posts')) {
+		if($post->post_type=='newsletter') {
+		$actions['duplicate'] = '<a href="admin.php?action=sendit_duplicate_post_as_draft&amp;post=' . $post->ID . '" title="Duplicate this item" rel="permalink">Duplicate</a>';			
+		}
 
+	}
+	return $actions;	
+}
+ 
+add_filter( 'post_row_actions', 'sendit_duplicate_post_link', 10, 2 );
 
 
 
@@ -339,6 +458,11 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 		echo $buymsg;
 		} else {
 				if(get_post_meta($id, 'send_now', TRUE)=='2'):
+				   if(time()>wp_next_scheduled('sendit_event')) {
+				   		//wp_clear_scheduled_hook( 'sendit_event' );
+				   		//wp_schedule_event(time()+get_option('sendit_interval'), 'sendit_send_newsletter', 'sendit_event');
+				   		//echo 'cron aggiornato';
+				   }
 					echo '<div class="jobrunning senditmessage"><p>'.__('Warning! newsletter is currently running the job','sendit').'</p></div>';
 				elseif(get_post_meta($id, 'send_now', TRUE)=='4'):
 					echo '<div class="jobdone senditmessage"><p>'.__('Newsletter Sent','sendit').'</p></div>';
@@ -421,7 +545,7 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 		else
 		{
 			if(get_post_meta($id, 'send_now', TRUE)==2):
-				echo strftime("%d/%m/%Y/ - %H:%M ",wp_next_scheduled('sendit_five_event'));
+				echo strftime("%d/%m/%Y - %H:%M ",wp_next_scheduled('sendit_event'));
 			endif;
 		}
 		
@@ -448,8 +572,10 @@ function senditfree_manage_newsletter_columns($column_name, $id) {
 			$phpmailer->Host = get_option('sendit_smtp_host');
 			// If we're using smtp auth, set the username & password SO WE USE AUTH
 			if (get_option('sendit_smtp_username')!='') {
+				//print_r($phpmailer);
 				$phpmailer->SMTPAuth = TRUE;
-				$phpmailer->SMTPSecure = 'ssl';
+				$phpmailer->SMTPSecure = get_option('sendit_smtp_ssl');
+				$phpmailer->SMTPDebug  = get_option('sendit_smtp_debug'); 
 				$phpmailer->Port = get_option('sendit_smtp_port'); 
 				$phpmailer->Username = get_option('sendit_smtp_username');
 				$phpmailer->Password = get_option('sendit_smtp_password');

@@ -3,8 +3,8 @@ Contributors: Giuseppe Surace
 Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 3.0.1
-Tested up to: 3.5
-Stable tag: 2.2.3
+Tested up to: 3.8.1
+Stable tag: 2.3.0
 
 Sendit is a friendly and easy newsletter and mailing lists plugin for Wordpress, born to make newsletter delivery management a great experience.
 
@@ -29,9 +29,18 @@ Checkout [Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wor
 * Sendit Pro Csv Export
 * Sendit Pro Google analytics campaign tracker
 
-[Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress Plugin")
+= Changelog =
+* 2.3.0 Admin css improvements
+* 2.2.9 Newsletter duplication - enables you to duplicate newsletters, useful when you have newsletters that you want to replicate. 
+* 2.2.8 Smtp hard fixes and debug - improved compatibility for better cron job integration
+* 2.2.7 Fixes some errors on log - disabled autosave and revisions for newsletter post type
+* 2.2.6 Fixes some warnings and builds better interface with the new wp-admin
+* 2.2.5 Fixes unsubscribe link duplication
+
+
+[Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress Newsletter Plugin")
  
-Version 2 is completely rebuilt based on custom post type. It gives you the chance to send more than 1 post selected from the custom post type panel newsletter.
+Version 2 is completely rebuilt based on custom post type. It gives you the chance to send more than 1 post selected from the custom post type panel newsletter, using pro version allows you to send professional newsletter scheduled and with wonderful responsive and customizable templates.
 
 
 All other information (general, changelog, installation, upgrade, usage) you need about this plugin can be found here: [Sendit readme](http://sendit.wordpressplanet.org/knowledges-base/ "Sendit Readme").
