@@ -364,7 +364,7 @@ function MainSettings($c='')
     
     //new 2.2.0
     $markup.='
-<div class="" id="sendit-banner">
+<div class="sendit-banner">
 	<span class="main">Welcome to the new Sendit '.SENDIT_VERSION.' control panel</span>
 	<span>Enhance your newsletter plugin by adding pro plugins! Learn more. <a target="_blank" title="Get Sendit" href="http://sendit.wordpressplanet.org/" class="button-primary">take a tour</a> and don\'t forget to subscribe our newsletter to be updated</span>
 	

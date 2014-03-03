@@ -56,8 +56,23 @@
     margin-bottom: 20px;
     display:block;
 }
-#sendit-banner span a,
-#template_choice a.button-primary.send_to_editor,
+
+#template_choice a.button-primary.send_to_editor{
+    border-width: 2px;
+    border-color: #5EB380;
+    background: #40BC69;
+    color: #fff;
+    text-decoration: none;
+    -webkit-box-shadow:none;
+    display: inline-block;
+    height: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    border: 3px solid rgba(0, 0, 0, 0);
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.5);
+	
+}
+
+
+.sendit-banner span a,
 .sendit_box_menu a.button-primary{
     border-width: 2px;
     border-color: #5EB380;
@@ -73,14 +88,14 @@
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.5);
 
 }
-#sendit-banner span a{
+.sendit-banner span a{
     line-height: inherit;
     padding:2px 5px;
     margin-bottom: 0;
     text-shadow: none;
 }
 
-#sendit-banner span a:hover,
+.sendit-banner span a:hover,
 .sendit_box_menu a.button-primary:hover{
     border-width: 2px;
     border-color: #5EB380;
@@ -102,14 +117,6 @@
 }
 
 
-
-/*
-Plugin Name: WP-Digg Style Paginator
-Plugin URI: http://www.mis-algoritmos.com/2007/09/09/wp-digg-style-pagination-plugin-v-10/
-Author: Victor De la Rocha
-Author URI: http://www.mis-algoritmos.com
-*/
-/*CSS Digg style pagination*/
 	#sendit_preview{width:300px;}
 	div.pagination {
 		padding: 3px;
