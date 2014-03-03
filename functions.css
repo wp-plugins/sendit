@@ -157,22 +157,22 @@
 }
 
 
-#sendit-banner{
+.sendit-banner{
     background: url("images/sendit-small.png") no-repeat scroll 14px 11px #F5F5F5;
     border: 1px solid #D9D9D9;
     border-radius: 5px 5px 5px 5px;
     box-shadow: 1px 1px 0 #FFFFFF inset, -1px -1px 0 #FFFFFF inset;
-    margin: 0 0 2em;
+    margin: 4em 2em 2em 0;
     padding: 15px 15px 15px 110px;
     position: relative;
 }
 
-#sendit-banner span.main {
+.sendit-banner span.main {
     font-size: 16px;
     font-weight: bold;
     margin-top: 2px;
 }
-#sendit-banner span {
+.sendit-banner span {
     color: #595959;
     display: block;
     font-size: 14px;
