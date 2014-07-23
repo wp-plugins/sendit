@@ -191,7 +191,7 @@ function SmtpSettings()
         $markup.='<div id="message" class="updated fade"><p><strong>'.__('Settings saved!', 'sendit').'</strong></p></div>';
     endif;
     $markup.='<h3>'.__('Smtp settings are required only if you want to send mail using an SMTP server','sendit').'</h3>
-    <p>'.__('By default Sendit will send newsletter using the mail() function, if you sant to send mail using SMTP server you just have to type your settings here').'</p>
+    <p>'.__('By default Sendit will send newsletter using the mail() function, if you want to send mail using SMTP server you just have to type your settings in this section.<br /> I strongly recommend to use my own SMTP service in partnership with Smtp.com. Easy to configure as you can see on the link below').'</p>
 <form method="post" action="'.$_SERVER[REQUEST_URI].'">
 <table class="form-table">
     <tr>
@@ -207,7 +207,7 @@ function SmtpSettings()
     </tr>
 
     <tr>
-        <th><label for="sendit_smtp_host">'.__('SMTP host', 'sendit').'<br />('.__('Need One', 'sendit').'? <a href="http://www.sendit.smtp.com">'.__('Try Sendit SMTP', 'sendit').')</a></label></th>
+        <th><label for="sendit_smtp_host">'.__('SMTP host', 'sendit').'<br />('.__('Need One', 'sendit').'? <a href="http://www.smtp.com/senditwordpress/">'.__('Try Sendit with SMTP.com', 'sendit').'</a>)</label></th>
         <td><input name="sendit_smtp_host" id="sendit_smtp_host" type="text" value="'.get_option('sendit_smtp_host').'" class="regular-text code" /></td>
     </tr>
 
@@ -247,11 +247,11 @@ function SmtpSettings()
 <i>'.
 __('Are you on panic for large mailing lists, bad delivery (spam etc)?','sendit').'<br />';
 
-$markup.='<strong>Relax!</strong>'.__('Let SendGrid handle your email delivery used with Sendit. Get 25% off any plan by clicking my link.','sendit');
+$markup.='<strong>Relax!</strong>'.__('Let SMTP.com with Sendit handle your email delivery used with Sendit. Get 25% off any plan by clicking my link.','sendit');
 
-$markup.='<br /><a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a><br />';
+$markup.='<br /><a href="http://www.smtp.com/senditwordpress/"><strong>Sendit SMTP.com</strong> service</a><br />';
 
-$markup.='SendGrid helps you reach more users instead of spam folders. Click this link to get your 25% discount on your first month\'s membership. Believe me you will be addicted!<br />';
+$markup.='<br /><br />Also SendGrid helps you reach more users instead of spam folders. Click this link to get your 25% discount on your first month\'s membership. Believe me you will be addicted!<br />';
 
 $markup.='<a href="http://sendgrid.tellapal.com/a/clk/3Rv3Ng">http://sendgrid.tellapal.com/a/clk/3Rv3Ng</a>';
 
