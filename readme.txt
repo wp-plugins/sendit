@@ -3,8 +3,8 @@ Contributors: Giuseppe Surace
 Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 3.0.1
-Tested up to: 3.8.1
-Stable tag: 2.3.3
+Tested up to: 3.9.1
+Stable tag: 2.3.4
 
 Sendit is a friendly and easy newsletter and mailing lists plugin for Wordpress, born to make newsletter delivery management a great experience.
 
@@ -28,6 +28,7 @@ Checkout [Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wor
 * Sendit Pro Css Inliner
 * Sendit Pro Csv Export
 * Sendit Pro Google analytics campaign tracker
+* Sendit Splitter - Lists segmentation tool (new)
 
 = Changelog =
 * 2.3.2 Swedish language addes (Thanks to Fuad Sabanovic) and notices box fixed
