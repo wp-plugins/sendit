@@ -52,8 +52,12 @@ function sendit_install() {
                   `email_lista` varchar(250) default NULL,
                   `header` mediumtext NULL,
                   `footer` mediumtext NULL,
+                  `list_parent` int(11) default '0',                 
                    PRIMARY KEY  (`id_lista`)
                  );";
+
+   //splitter
+   $sql_parent="ALTER TABLE ". SENDIT_LIST_TABLE ." add column list_parent int(11) default '0'";
 
    $sql_alter="ALTER TABLE ". SENDIT_EMAIL_TABLE ." add column subscriber_info text default NULL";
 
@@ -61,6 +65,7 @@ function sendit_install() {
    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
    dbDelta($sql_email);
    dbDelta($sql_liste);   
+   dbDelta($sql_parent);   
    dbDelta($sql_alter);   
    
    

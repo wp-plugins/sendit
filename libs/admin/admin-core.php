@@ -766,6 +766,12 @@ function gestisci_menu() {
     add_submenu_page(__FILE__, __('List Options', 'sendit'), __('Lists management', 'sendit'), 8, 'lists-management', 'ManageLists');   
     add_submenu_page(__FILE__, __('Main settings', 'sendit'), __('Main settings', 'sendit'), 8, 'sendit_general_settings', 'senditpanel_admin');
 
+	if (is_plugin_active('sendit-splitter/sendit-splitter.php')) {	
+		add_submenu_page(__FILE__, __('Manage Segments', 'sendit'), __('Lists Segmentation', 'sendit'), 8, 'segments', 'Sublists');
+	}
+	
+
+
 	/*2.0 export addon*/
 	if (function_exists('sendit_morefields')) 
 	{
@@ -786,6 +792,10 @@ function gestisci_menu() {
     
     add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from WP Users', 'sendit'), 8, 'import', 'ImportWpUsers');
 
+
+	if (is_plugin_active('sendit-woocommerce-import/sendit-woocommerce-import.php')) {
+		add_submenu_page(__FILE__, __('Woocommerce import', 'sendit'), __('Import email from Woocommerce', 'sendit'), 8, 'import-woocommerce-customers', 'ImportWoocommerceCustomers');
+	}
  
 	if ($wpdb->get_var("show tables like 'bb_press'") != '') :
 		add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from BBpress', 'sendit'), 8, 'import-bb-users', 'ImportBbPress');
