@@ -33,3 +33,53 @@
 			
 		});
 });
+
+jQuery(document).ready(function($) {        
+     
+      $(".send_to_editor").click( function() {
+      	   post_id= $(this).data("post-id");  
+      	   content_type = $(this).data("content-type");  
+		   ajaxURL = ajaxurl;//SingleAjax.ajaxurl
+		
+    $.ajax({
+    	type: 'POST',
+		url: ajaxURL,
+		data: {"action": "sendit-load-single","post_id": post_id,"content_type": content_type},
+		success: function(response) {			
+			send_to_editor(response);
+        }
+    }); 
+
+      });
+      
+      $(".editable").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+      type : "text",
+      submit    : "OK",
+      name : "email",
+		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+      }
+      );
+      
+      
+      $(".edit_select").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+      type : "select",
+      data   : "{'n':'<?php echo __('not confirmed','sendit'); ?>','y':'<?php echo __('confirmed','sendit'); ?>','d':'<?php echo __('delete','sendit'); ?>'}",
+      submit    : "OK",
+      name : "accepted",
+		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+      }
+      );
+              
+         /* todo!!!
+         $(".buttonsend").click(function(){
+          $.post("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", { name: "John", time: "2pm" },
+				function(data) {
+			 alert("Data Loaded: " + data);
+				});
+			 });
+			 */
+              
+              
+ });

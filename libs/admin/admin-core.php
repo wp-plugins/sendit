@@ -1,6 +1,72 @@
 <?php
 
 
+function sendit_admin_setup(){
+	wp_localize_script( 'single-ajax-request', 'SingleAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+}
+add_action( 'wp_enqueue_scripts', 'sendit_admin_setup' );
+
+
+add_action ( 'wp_ajax_nopriv_sendit-load-single', 'sendit_single_ajax_content' );
+add_action ( 'wp_ajax_sendit-load-single', 'sendit_single_ajax_content' );
+
+function sendit_single_ajax_content () {
+		   $response='';
+		   $post_id=$_POST['post_id'];		   
+		   $post = get_post($post_id);
+		   if($_POST['content_type'] == 'post'):
+		   	$response.='<h3> '.apply_filters('the_title',$post->post_title).'</h3>';	
+		   	$response.='<hr />';					
+		   	$thumb = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'thumbnail');
+		   	$url = $thumb['0'];		   
+		  	$thumb_url = wp_get_attachment_url('thumbnail', true);
+		  	$response.='<img src="'.$url.'" class="img-responsive" alt="'.apply_filters('the_title',$post->post_title).'" />';
+		  	$response.= $post->post_content;		
+		   else:
+		   	$css= get_post_meta($post->ID, 'newsletter_css', TRUE);
+			$header= '<!-- [template_id='.$post->ID.'] -->';
+			$header.=get_post_meta($post->ID, 'headerhtml', TRUE);
+			//parse header shortcode...
+			$header=str_replace('[style]','<style>'.$css.'</style>',$header);
+			
+			//logo
+			if ( has_post_thumbnail($post->ID) ) {
+				$header_image=get_the_post_thumbnail($post->ID);
+				}
+			else {
+				$header_image='<img alt="" src="http://placehold.it/300x50/" />';
+			}
+			
+			
+			$header = str_replace('[logo]',$header_image,$header);
+			$header = str_replace('[homeurl]',get_bloginfo('siteurl'),$header);
+			$footer = get_post_meta($post->ID, 'footerhtml', TRUE); 
+			//build template scaffold
+			$response .= $header;
+			$response .= '<h2>'.__('Good Luck!','sendit').'</h2>';
+			$response .= '<p>'.__(' Start from here to edit your content').'</p>';
+			$response .= $footer;
+
+			
+		   endif;		   
+      
+     
+		    if(is_plugin_active('sendit-css-inliner/sendit-pro-css-inliner.php')):
+				$response=inline_newsletter($css,$response);				
+			endif;			
+				$response = preg_replace('/(&Acirc;|&nbsp;)+/i', ' ', $response);
+
+
+      
+      
+      echo $response;
+
+      
+      die(1);
+}
+
+
+
 function sendit_admin_head() {
   	wp_print_scripts( array('jquery-ui-draggable','jquery-ui-sortable' ));
 
@@ -766,6 +832,12 @@ function gestisci_menu() {
     add_submenu_page(__FILE__, __('List Options', 'sendit'), __('Lists management', 'sendit'), 8, 'lists-management', 'ManageLists');   
     add_submenu_page(__FILE__, __('Main settings', 'sendit'), __('Main settings', 'sendit'), 8, 'sendit_general_settings', 'senditpanel_admin');
 
+	if (is_plugin_active('sendit-splitter/sendit-splitter.php')) {	
+		add_submenu_page(__FILE__, __('Manage Segments', 'sendit'), __('Lists Segmentation', 'sendit'), 8, 'segments', 'Sublists');
+	}
+	
+
+
 	/*2.0 export addon*/
 	if (function_exists('sendit_morefields')) 
 	{
@@ -786,6 +858,10 @@ function gestisci_menu() {
     
     add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from WP Users', 'sendit'), 8, 'import', 'ImportWpUsers');
 
+
+	if (is_plugin_active('sendit-woocommerce-import/sendit-woocommerce-import.php')) {
+		add_submenu_page(__FILE__, __('Woocommerce import', 'sendit'), __('Import email from Woocommerce', 'sendit'), 8, 'import-woocommerce-customers', 'ImportWoocommerceCustomers');
+	}
  
 	if ($wpdb->get_var("show tables like 'bb_press'") != '') :
 		add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from BBpress', 'sendit'), 8, 'import-bb-users', 'ImportBbPress');
