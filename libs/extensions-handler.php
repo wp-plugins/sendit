@@ -203,8 +203,8 @@ function send_newsletter($post_ID)
 	$title = $article->post_title;
 	
 	//$content = apply_filters('the_content',$article->post_content);
-	$content= $article->post_content;
-	
+	$content = apply_filters('the_content',$article->post_content);
+
 	//$newsletter_content=$header.$content.$footer;
 	//new 2.1.2 content is already with footer and header
 	$newsletter_content=$content;
@@ -242,6 +242,7 @@ function send_newsletter($post_ID)
 			//verify if inliner is installed
 			if(is_plugin_active('sendit-css-inliner/sendit-pro-css-inliner.php')):
 				$newsletter_content=inline_newsletter($css,$newsletter_content);
+				$response = preg_replace('/(&Acirc;|&nbsp;)+/i', ' ', $response);
 			endif;
 			
 			if(is_plugin_active('sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php')):		
