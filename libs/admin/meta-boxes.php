@@ -192,7 +192,7 @@ function sendit_push_template($post) {
 	<div class="post_box">
 	<table>
 		<tr>
-			<th style="width:200px; text-align:left;"><?php echo $template->post_title; ?></th><td><a data-content-type="template" data-post-id="<?php echo $template->ID; ?>" class="button-primary send_to_editor">Apply Template &raquo;</a></td>
+			<th style="width:200px; text-align:left;"><?php echo $template->post_title; ?></th><td><a data-content-type="template" data-post-id="<?php echo $template->ID; ?>" class="button-primary send_to_editor">Apply Template &raquo;</a><span class="spinner"></span></td>
 		</tr>
 	</table>
 	</div>
