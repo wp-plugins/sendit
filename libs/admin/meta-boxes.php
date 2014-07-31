@@ -192,36 +192,9 @@ function sendit_push_template($post) {
 	<div class="post_box">
 	<table>
 		<tr>
-			<th style="width:200px; text-align:left;"><?php echo $template->post_title; ?></th><td><a class="button-primary send_to_editor">Apply Template &raquo;</a></td>
+			<th style="width:200px; text-align:left;"><?php echo $template->post_title; ?></th><td><a data-content-type="template" data-post-id="<?php echo $template->ID; ?>" class="button-primary send_to_editor">Apply Template &raquo;</a><span class="spinner"></span></td>
 		</tr>
 	</table>
-    	<div class="content_to_send" style="display:none;">
-    		<!-- [template_id=<?php echo $template->ID ?>] -->
-    		<?php 
-    		$css=get_post_meta($template->ID, 'newsletter_css', TRUE);
-			$header=get_post_meta($template->ID, 'headerhtml', TRUE);
-			//parse header shortcode...
-			$header=str_replace('[style]','<style>'.$css.'</style>',$header);
-			
-			//logo
-			if ( has_post_thumbnail($template->ID) ) {
-				$header_image=get_the_post_thumbnail($template->ID);
-				}
-			else {
-				$header_image='<img alt="" src="http://placehold.it/300x50/" />';
-			}
-			
-			
-			$header=str_replace('[logo]',$header_image,$header);
-			$header=str_replace('[homeurl]',get_bloginfo('siteurl'),$header);
-			$footer=get_post_meta($template->ID, 'footerhtml', TRUE); 
-			//build template scaffold
-			echo $header;
-			echo '<h2>'.__('Good Luck!','sendit').'</h2>';
-			echo '<p>'.__(' Start from here to edit your content').'</p>';
-			echo $footer;
-			?>
-    	</div>
 	</div>
 	<?php endforeach; ?>
 
@@ -290,21 +263,10 @@ function sendit_content_box($post) {
 	<div class="post_box">
 	<table>
 		<tr>
-			<th style="width:200px; text-align:left;"><?php echo $post->post_title; ?></th><td><a class="button-secondary send_to_editor">Send to Editor &raquo;</a></td>
+			<th style="width:200px; text-align:left;"><?php echo $post->post_title; ?></th><td><a class="button-secondary send_to_editor" data-content-type="post" data-post-id="<?php echo $post->ID; ?>">Send to Editor &raquo;</a></td>
 		</tr>
 	</table>
-    	<div class="content_to_send" style="display:none;">
-    		<div class="sendit_article" style="clear:both; display:block;">
-    		<h3><a href="<?php echo get_permalink( $post->ID); ?>"><?php echo $post->post_title; ?></a></h3>
-		    		<?php if ( has_post_thumbnail() ) {
-		    			$attr = array('class'	=> "alignleft");
-						the_post_thumbnail('thumbnail',$attr);
-				}?>
-    		<?php echo apply_filters('the_excerpt',$post->post_content); ?><br />
-    		<div class="sendit_readmore" style="clear:both; display:block;"><a href="<?php echo get_permalink($post->ID); ?>"  class="sendit_more_button">view more</a></div>
 
-    		</div>
-    	</div>
     </div>
 
 <?php endforeach; 
