@@ -3,7 +3,7 @@
 Plugin Name: Sendit
 Plugin URI: http://www.giuseppesurace.com/sendit-wp-newsletter-mailing-list/
 Description: Wordpress newsletter plugin. Sendit is a friendly and easy newsletter and mailing lists plugin for WordPress, born to make newsletter delivery management a great experience.
-Version: 2.3.7
+Version: 2.3.8
 Author: Giuseppe Surace
 Author URI: http://sendit.wordpressplanet.org
 */
@@ -85,7 +85,7 @@ function sendit_cron_notice() {
         /* Check that the user hasn't already clicked to ignore the message */
 
     include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-	if(!is_plugin_active('sendit-scheduler/sendit-cron.php')){
+	if(!is_plugin_active('sendit-scheduler/sendit-cron.php') && get_user_meta($user_id, 'sendit_cron_ignore')==0){
         echo '<div class="updated"><h3>'.__('It\'s time to upgrade your Sendit plugin to PRO version and schedule your newsletter', 'sendit').'</h3>
 				<span>'.__('Scheduling newsletters it is important to automate this process and send block of emails to avoid spam and hosting rate limits.','sendit').' <a target="_blank" title="Get Sendit" href="http://sendit.wordpressplanet.org/plugin-shop/sendit-pro/?utm_source=banner_pro&utm_medium=plugin&utm_campaign=sendit_231" class="button-primary">Buy Now Sendit Scheduler</a> | <a class="button-secondary" href="admin.php?page=sendit/libs/admin/admin-core.php&sendit_cron_ignore=0">Hide Notice</a></span>';
 				
