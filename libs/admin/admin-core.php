@@ -1593,7 +1593,7 @@ function buy_plugin()
 { ?>
 <div id="premium-panel">
 	<span class="main">You don't have Sendit Pro Scheduler installed</span>
-<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org">Buy Now</a></span>
+<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org/plugin-shop/sendit-pro/">Buy Now</a></span>
 </div>
 <?php }
 
@@ -1604,7 +1604,7 @@ function buy_plugin_page()
 <h2>Sendit Pro Scheduler...</h2>
 	<div id="premium-panel">
 		<span class="main">Ops! You don't have Sendit Pro Scheduler installed or maybe you forgot to activate!</span>
-	<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org">Buy Now</a></span>
+	<span>Scheduler split delivery process for you using cron jobs <a class="button-primary" href="http://sendit.wordpressplanet.org/plugin-shop/sendit-pro/">Buy Now</a></span>
 	</div>
 </div>
 <?php }

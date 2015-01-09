@@ -457,8 +457,8 @@ add_action('manage_posts_custom_column', 'senditfree_manage_newsletter_columns',
 
 function senditfree_manage_newsletter_columns($column_name, $id) {
 	global $wpdb;
-	$buymsg='<small>'.__('To use this feature You need to buy Sendit Pro plugin', 'sendit').'</small><br />';
-	$buymsg.= '<a href="http://sendit.wordpressplanet.org/plugin-shop/wordpress-plugin/sendit-pro-scheduler/">Buy now</a>';
+	$buymsg='<small>'.__('To schedule newsletter delivery you need Sendit Pro scheduler', 'sendit').'</small><br />';
+	$buymsg.= '<a href="http://sendit.wordpressplanet.org/plugin-shop/sendit-pro/">Buy now</a>';
 	switch ($column_name) {
 	case 'id':
 		echo $id;
