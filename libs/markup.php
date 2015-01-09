@@ -8,6 +8,22 @@ add_shortcode('newsletter', 'sendit_shortcode');
 
 
 
+function datatable_js() {
+
+	wp_enqueue_script(
+		'dataTables',
+		plugins_url( 'sendit/datatable/js/jquery.dataTables.js'),
+		array( 'jquery' )
+	);
+
+	wp_enqueue_style( 'dataTables', plugins_url( 'sendit/datatable/css/jquery.dataTables.min.css'));
+
+}
+
+add_action( 'admin_init', 'datatable_js' );
+
+
+
 function sendit_markup($id)
 {
      /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

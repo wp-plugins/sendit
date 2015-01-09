@@ -1,6 +1,4 @@
 <?php
-
-
 function sendit_admin_setup(){
 	wp_localize_script( 'single-ajax-request', 'SingleAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 }
@@ -15,13 +13,16 @@ function sendit_single_ajax_content () {
 		   $post_id=$_POST['post_id'];		   
 		   $post = get_post($post_id);
 		   if($_POST['content_type'] == 'post'):
-		   	$response.='<h3> '.apply_filters('the_title',$post->post_title).'</h3>';	
-		   	$response.='<hr />';					
+            $response.='<div class="title">';
+		   	$response.='<h2><a href="'.get_permalink($post_id).'">'.apply_filters('the_title',$post->post_title).'</a></h2>';
+		   	$response.='</div>';
+			$response.='<div class="body-text">';						
 		   	$thumb = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'thumbnail');
 		   	$url = $thumb['0'];		   
 		  	$thumb_url = wp_get_attachment_url('thumbnail', true);
-		  	$response.='<img src="'.$url.'" class="img-responsive" alt="'.apply_filters('the_title',$post->post_title).'" />';
-		  	$response.= $post->post_content;		
+		  	$response.='<a href="'.get_permalink($post_id).'"><img src="'.$url.'" class="img-responsive alignleft" alt="'.apply_filters('the_title',$post->post_title).'" /></a>';
+		  	$response.= $post->post_content;
+		  	$response.='</div>';		
 		   else:
 		   	$css= get_post_meta($post->ID, 'newsletter_css', TRUE);
 			$header= '<!-- [template_id='.$post->ID.'] -->';
@@ -42,6 +43,8 @@ function sendit_single_ajax_content () {
 			$header = str_replace('[homeurl]',get_bloginfo('siteurl'),$header);
 			$footer = get_post_meta($post->ID, 'footerhtml', TRUE); 
 			//build template scaffold
+			
+			
 			$response .= $header;
 			$response .= '<h2>'.__('Good Luck!','sendit').'</h2>';
 			$response .= '<p>'.__(' Start from here to edit your content').'</p>';
@@ -65,6 +68,12 @@ function sendit_single_ajax_content () {
       die(1);
 }
 
+
+function count_subscribers($id_lista) {
+     global $wpdb;
+	 $user_count = $wpdb->get_var("SELECT COUNT(*) FROM ".SENDIT_EMAIL_TABLE." where id_lista = $id_lista");
+	 return $user_count;
+}
 
 
 function sendit_admin_head() {
@@ -158,19 +167,17 @@ function ManageLists() {
                     
                     
                     echo "
-                    <form action='$_SERVER[REQUEST_URI]' method='post' name='addml'><table class=\"wp-list-table widefat fixed posts\">
+                    <form action='$_SERVER[REQUEST_URI]' method='post' name='addml'>
                     <input type='submit' class='button-primary sendit_actionbuttons' name='go' value='".__('Create new list', 'sendit')."'>
-                   
+                    <input type='hidden' name='com' value='ADD' />
+                    </form>
+                         <table class=\"wp-list-table widefat fixed posts\">
                             <thead>
                             <tr>
-                            <th colspan=\"2\">".__('Available lists', 'sendit')."
-                            </th>
-                            <th align=\"right\">
-                            <label for='com'>
-                            <input type='hidden' name='com' value='ADD'>
-                            </label>
-                            
-                        </form></th>
+                            <th>".__('Available lists', 'sendit')."</th>
+                            <th>".__('from','sendit')."</th>
+                            <th style=\"width:100px;\">".__('Subscribers','sendit')."</th>
+                            <th>".__('actions','sendit')."</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -178,9 +185,10 @@ function ManageLists() {
                     foreach ($liste as $lista) {
                         
                         echo "<tr>
-                            <td><p>".__('Mailing list', 'sendit')." ". $lista->id_lista." - ". $lista->email_lista. " - "  .$lista->nomelista."</p></td>
-                            <td><p><a class=\"button-secondary\" href=\"admin.php?page=lists-management&update=1&id_lista=".$lista->id_lista."\">".__('Edit', 'sendit')."</a></p></td>
-                        	<td><p><a href=\"admin.php?page=lists-management&delete=1&id_lista=".$lista->id_lista."\">".__('Delete', 'sendit')."</a></td></p></tr>";
+                            <td>". $lista->id_lista." - "  .$lista->nomelista."</td>
+                            <td>". $lista->email_lista. " </td>
+                            <td><b>".count_subscribers($lista->id_lista)."</b></td>
+                            <td><a class=\"button-secondary\" href=\"admin.php?page=lists-management&update=1&id_lista=".$lista->id_lista."\"><i class=\"dashicons-before dashicons-admin-tools\"></i> ".__('Edit', 'sendit')."</a> <a class=\"button-secondary\" href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\"><i class=\"dashicons-before dashicons-admin-users\"></i> ".__('Manage subscribers', 'sendit')."</a> <a class=\"button-secondary\" href=\"admin.php?page=lists-management&delete=1&id_lista=".$lista->id_lista."\">".__('Delete', 'sendit')."</a></td></p></tr>";
                         
                         }
                         
@@ -485,9 +493,12 @@ function MainSettings($c='')
 	$markup.='<div class="sendit_box_shop sendit_box_menu"><h2>'.__('Extend your plugin', 'sendit').'</h2>
 		  	<a href="http://sendit.wordpressplanet.org" class="button-primary">'.__('Go to the shop', 'sendit').'</a>
 		  </div>';	
-	
 
-
+if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {	
+	$markup.='<div class="sendit_box_woocommerce sendit_box_menu"><h2>'.__('Woocommerce user?', 'sendit').'</h2>
+		  	<a href="http://sendit.wordpressplanet.org" class="button-primary">'.__('Import your customer into Sendit', 'sendit').'</a>
+		  </div>';
+}
 
 
 
@@ -613,7 +624,7 @@ function Iscritti() {
 	if($email_items > 0) {
 		$p = new pagination;
 		$p->items($email_items);
-		$p->limit(20); // Limit entries per page
+		$p->limit(100); // Limit entries per page
 		$p->target("admin.php?page=lista-iscritti&lista=".$_GET['lista']);
 		$p->currentPage($_GET[$p->paging]); // Gets and validates the current page
 		$p->calculate(); // Calculates what to show
@@ -635,100 +646,88 @@ function Iscritti() {
 
    
     
-    $emails = $wpdb->get_results("SELECT id_email, id_lista, email, subscriber_info, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' order by email $limit");
+    $emails = $wpdb->get_results("SELECT id_email, id_lista, email, subscriber_info, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' order by email");
     //email confermat
     $emails_confirmed = $wpdb->get_results("SELECT id_email, id_lista, email, subscriber_info, magic_string, accepted FROM $table_email where id_lista= '$_GET[lista]' and accepted='y'");
 
-    echo "<div class=\"wrap\"><h2>".__('Select List to Segment', 'sendit')."</h2>";
+    echo "<div class=\"wrap\"><h2>".__('Select List to manage subscribers', 'sendit')."</h2>";
     
     
     //estraggo le liste
     $table_liste =  $wpdb->prefix . "nl_liste";   
-    $liste = $wpdb->get_results("SELECT id_lista, nomelista FROM $table_liste ");
+    $liste = $wpdb->get_results("SELECT id_lista, nomelista, email_lista FROM $table_liste ");
    // print_r($_POST);
 
 
    
    
     echo "<div class=\"table\">
-			<table class=\"widefat  fixed\">
-				<thead>
-					<tr>
-						<th>".__('id', 'sendit')."</th>
-						<th class=".$css_list.">".__('mailing list', 'sendit')."</th>
-						<th>".__('actions', 'sendit')."</th>
-
-					</tr>
-				</thead><tbody>";
-
-            foreach ($liste as $lista) {
-
-                if ($_GET['lista']==$lista->id_lista) : $selected=" class=\"updated fade\"";  else : $selected=""; endif;     
-
-                echo "<tr >
-                		<td>".$lista->id_lista."</td>
-                		<td ".$selected."><a class=\"\" href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\">".$lista->nomelista."</a></td>
-                		<td></td><tr>";
-            }
-        echo"</tbody></table>
-        </div><br clear=\"all\ />";
-    
+                         <table class=\"wp-list-table widefat fixed posts stripe hover\">
+                            <thead>
+                            <tr>
+                            <th scope=\"col\">".__('Available lists', 'sendit')."</th>
+                            <th scope=\"col\">".__('from','sendit')."</th>
+                            <th scope=\"col\" style=\"width:100px;\">".__('Subscribers','sendit')."</th>
+                            <th scope=\"col\">".__('actions','sendit')."</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            ";
+                    foreach ($liste as $lista) {
+                        
+                        echo "<tr>
+                            <td>". $lista->id_lista." - "  .$lista->nomelista."</td>
+                            <td>". $lista->email_lista. " </td>
+                            <td><b>".count_subscribers($lista->id_lista)."</b></td>
+                            <td><a class=\"button-secondary\" href=\"admin.php?page=lists-management&update=1&id_lista=".$lista->id_lista."\"><i class=\"dashicons-before dashicons-admin-tools\"></i> ".__('Edit', 'sendit')."</a> <a class=\"button-secondary\" href=\"admin.php?page=lista-iscritti&lista=".$lista->id_lista."\"><i class=\"dashicons-before dashicons-admin-users\"></i> ".__('Manage subscribers', 'sendit')."</a> <a class=\"button-secondary\" href=\"admin.php?page=lists-management&delete=1&id_lista=".$lista->id_lista."\">".__('Delete', 'sendit')."</a></td></p></tr>";
+                        
+                        }
+                        
+                        echo "</tbody>
+                        </table>
+                        
+                        </div>";
+                            
     /*miglioro facendo comparire la form x aggiungere solo se selezionata una lista*/
     if ($_GET['lista']) :
         
         echo "<h3>".__('Manual Subscribe mailing list ', 'sendit')." ".$_POST['lista']."</h3>
 
-                <label for=\"email_add\">".__('email address (one or more: default separator= line break)', 'sendit')."<br />
-               <div id=\"dashboard-widgets\" class=\"metabox-holder\">
-               <div class='postbox-container' style='width:49%;'>
-				<div id=\"normal-sortables\" class=\"meta-box-sortables\">
-				<div id=\"dashboard_right_now\" class=\"postbox \" >
-					<div class=\"handlediv\" title=\"Fare clic per cambiare.\"><br /></div>
-				<h3 class='hndle'><span>".__('Subscription','sendit')."</span></h3>
-				<div class=\"inside\">
-				        <p>".__('Copy here one or more email address', 'sendit')."</p>
 
-					           <form id=\"add\" name=\"add\" method=\"post\">
+			<p>".__('Copy here one or more email address', 'sendit')."</p>
 
-                
+			<form id=\"add\" name=\"add\" method=\"post\" action=\"\">
+                <label for=\"emails_add\">".__('email address (one or more: default separator= line break)', 'sendit')."<br />            
                 <textarea id=\"emails_add\" type=\"text\" value=\"\" name=\"emails_add\" rows=\"10\" cols=\"50\"/></textarea></label>
                  <input type=\"hidden\" name=\"id_lista\" value=\"".$_GET[lista]."\" /> 
+				 <br />
+                <input class=\"button-primary\" type=\"submit\" value=\"".__('Add', 'sendit')."\"/>
+            </form>
 
-                <input class=\"button\" type=\"submit\" value=\"".__('Add', 'sendit')."\"/>
-                </p>
-                            </form>
-                </div>
-               </div>
-               </div>
-               </div>
-               </div>
-               <br clear=\"all\" />";
-        //posiziono la paginazione
+        <br clear=\"all\" />";
+
 
 		echo "<h3>".__('Subscribers', 'sendit')." n.".$email_items." (".__('Subscriptions confirmed', 'sendit').": ".count($emails_confirmed).")</h3>";
-       if($p):
-			echo $p->show();
-		endif;
 
         
-        echo "
-        <br clear=\"all\" />
-        <form action=\"\" method=\"post\">
+        echo "<input type=\"button\" name=\"email_all\" id=\"email_all\" value=\"".__('Select all','sendit')."\">
+        <input type=\"button\" name=\"email_none\" id=\"email_none\" value=\"".__('Unselect all','sendit')."\">
+        <form action=\"\" method=\"post\" id=\"subscribers-form\">
 			<p><i>".__('Tips: now you can handle multiple email and editing email address and status simply clicking on it', 'sendit')."</i></p>
-			<table class=\"widefat post fixed\">
+			<table class=\"widefat post fixed hover stripe\" id=\"subscribers-table\">
 				<thead>
 					<tr>";
-					if(get_option('sendit_gravatar')=='yes'):
-						echo "<th style=\"width:30px !important;\"></th>";
-				    endif;
-				   echo "<th style=\"width:30px !important;\"></th>
-				   		<th style=\"width:300px !important;\">".__('email', 'sendit')."</th>
-						<th style=\"width:100px !important;\">".__('status', 'sendit')."</th>
-						<th>".__('Additional info', 'sendit')."</th>
-					</tr>
-				</thead>
-    	
-        ";
+				   echo "<th style=\"width:20px; text-align:left;\"></th>
+				   		<th>".__('email', 'sendit')."</th>
+						<th>".__('status', 'sendit')."</th>";
+						
+					//additioal fields only if morefields is active
+					if ( is_plugin_active( 'sendit-morefields/sendit-morefields.php' ) ) {	
+						echo subscriber_columns();
+					}
+					//end additional fields
+					echo "</tr>
+				</thead>";
         
       
         foreach ($emails as $email) {
@@ -740,35 +739,10 @@ function Iscritti() {
             	$style="style=\"vertical-align:middle; padding:0; text-align:center; background:#fffbcc;\""; }
             else { 
             	$style="style=\"vertical-align:middle; padding:0; text-align:center; background:#fd919b;\""; }
-            
-        	/*
-        	//fare funzione per ricaare i valori ovunque            
-        	$subscriber_info= json_decode($email->subscriber_info);  
-        	$subscriber_options = explode("&", $subscriber_info->options);
-        	$options='';
-        
-        	foreach($subscriber_options as $option):
-        		$option=explode("=", $option);
-        		if(!empty($option)):
-        		//stampo solo i campi unserializzati senza email_add e lista
-	        		if($option[0]!='email' and $option[0]!='lista'):
-	        			$options.=$option[0];
-	        			$options.=':';
-	        			$options.='<br />';
-	        			$options.='<input type="text" name="'.$option[0].'" value="'.urldecode($option[1]).'" />';
-	        			$options.='<br />';
-	        		endif;
-        		endif;
 
-        	endforeach;
-        */
         if($email->accepted=='y') { $confirmed='confirmed'; } elseif($email->accepted=='d') {$confirmed='unsubscribed';} else {$confirmed='not confirmed';} 
-        echo "<tr>	";
-        		if(get_option('sendit_gravatar')=='yes'):
-					echo "<td class=\"grav\" style=\"width:30px !important;\">".get_avatar($email->email,'24')."</td>";
-				endif;
-                
-                echo "<td>
+        echo "<tr>";
+                                echo "<td>
                         <input type=\"checkbox\" name=\"email_handler[]\" value=\"".$email->id_email."\">
                         </td>
                         <td id=\"email_".$email->id_email."\">
@@ -779,46 +753,58 @@ function Iscritti() {
                         </td>
                         <td   ".$style.">
                         <div class='edit_select' id='accepted-".$email->id_email."'>".$confirmed."</div>
-                        </td>
-                       <td>".subscriber_options($email->subscriber_info)."</td>
-
-                       
-            </tr>    ";
-            
-        
+                        </td>";
+                    //additioal fields only if morefields is active
+					if ( is_plugin_active( 'sendit-morefields/sendit-morefields.php' ) ) {	
+                        echo subscriber_columns_values($email->subscriber_info);
+					}
+						
+        echo "</tr>";        
         }
     
     
     
-    echo "		<tfoot>
-					<tr>";
-					
-				if(get_option('sendit_gravatar')=='yes'):
-					echo "<th style=\"width:30px !important;\"></th>";
-				endif;
-					echo "<th style=\"width:30px !important;\"></th>
-						<th>".__('email', 'sendit')."</th>
-						<th style=\"width:50px !important;\">".__('status', 'sendit')."</th>
-						<th>".__('Additional info', 'sendit')."</th>
-					</tr>
-				</tfoot>
-</table>
-<div class=\"clear\"></div>
-<input type=\"submit\" class=\"button-primary\" name=\"delete\" value=\"".__('Delete Selected emails', 'sendit')."\">
+echo "</table>
 
-</form>
-<br clear=\"all\" />";
-    //ripeto la paginazione
-    if($p):
-			echo $p->show();
-	endif;
-    
+<div class=\"clear\"></div>
+	<input type=\"submit\" class=\"button-primary\" name=\"delete\" value=\"".__('Delete Selected emails', 'sendit')."\">
+	<input type=\"submit\" class=\"button-primary\" name=\"sublist\" value=\"".__('Create sublist from selected addresses', 'sendit')."\">
+</form>";
+
+
     endif;    
-    
-    echo "</div>";
+
+echo "</div>";
   
-    
-}
+ }
+
+
+function editable_js() { ?>
+<script>
+jQuery(document).ready(function(){
+      jQuery(".editable").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+      type : "text",
+      submit    : "OK",
+      name : "email",
+		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+      }
+      );
+      
+      
+      jQuery(".edit_select").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
+      type : "select",
+      data   : "{'n':'<?php echo __('not confirmed','sendit'); ?>','y':'<?php echo __('confirmed','sendit'); ?>','d':'<?php echo __('delete','sendit'); ?>'}",
+      submit    : "OK",
+      name : "accepted",
+		  cancel    : "<?php echo __('cancel','sendit'); ?>",
+		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
+      }
+      );
+});
+</script>
+<?php }
+add_action( 'admin_head', 'editable_js' );
 
 
 
@@ -832,12 +818,6 @@ function gestisci_menu() {
     add_submenu_page(__FILE__, __('List Options', 'sendit'), __('Lists management', 'sendit'), 8, 'lists-management', 'ManageLists');   
     add_submenu_page(__FILE__, __('Main settings', 'sendit'), __('Main settings', 'sendit'), 8, 'sendit_general_settings', 'senditpanel_admin');
 
-	if (is_plugin_active('sendit-splitter/sendit-splitter.php')) {	
-		add_submenu_page(__FILE__, __('Manage Segments', 'sendit'), __('Lists Segmentation', 'sendit'), 8, 'segments', 'Sublists');
-	}
-	
-
-
 	/*2.0 export addon*/
 	if (function_exists('sendit_morefields')) 
 	{
@@ -848,21 +828,22 @@ function gestisci_menu() {
 		add_submenu_page(__FILE__, __('Fields list', 'sendit'), __('Fields settings', 'sendit'), 8, 'sendit_morefields_settings', 'sendit_morefields_screen');
 	}
  
-
-    add_submenu_page(__FILE__, __('SMTP settings', 'sendit'), __('SMTP settings', 'sendit'), 8, 'sendit_smtp_settings', 'SmtpSettings');  
-  
+    add_submenu_page(__FILE__, __('SMTP settings', 'sendit'), __('SMTP settings', 'sendit'), 8, 'sendit_smtp_settings', 'SmtpSettings');   
     add_submenu_page(__FILE__, __('Test email', 'sendit'), __('Test email', 'sendit'), 8, 'sendit_test_email', 'sendit_test_email');  
-
-    add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from comments', 'sendit'), 8, 'mass-import', 'ImportWpComments');
-    
-    
+    add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from comments', 'sendit'), 8, 'mass-import', 'ImportWpComments');       
     add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from WP Users', 'sendit'), 8, 'import', 'ImportWpUsers');
 
-
-	if (is_plugin_active('sendit-woocommerce-import/sendit-woocommerce-import.php')) {
-		add_submenu_page(__FILE__, __('Woocommerce import', 'sendit'), __('Import email from Woocommerce', 'sendit'), 8, 'import-woocommerce-customers', 'ImportWoocommerceCustomers');
+	//woocommerce import 2.3.7
+	if (is_plugin_active('woocommerce/woocommerce.php')) {
+		if (is_plugin_active('sendit-woocommerce-import/sendit-woocommerce-import.php')) {
+			add_submenu_page(__FILE__, __('Woocommerce import', 'sendit'), __('Import email from Woocommerce', 'sendit'), 8, 'import-woocommerce-customers', 'ImportWoocommerceCustomers');
+		}
+		else
+		{
+			add_submenu_page(__FILE__, __('Woocommerce import', 'sendit'), __('Import email from Woocommerce', 'sendit'), 8, 'import-woocommerce-screen', 'sendit_woocommerce_screen');
+		}
 	}
- 
+		 
 	if ($wpdb->get_var("show tables like 'bb_press'") != '') :
 		add_submenu_page(__FILE__, __('email import', 'sendit'), __('Import emails from BBpress', 'sendit'), 8, 'import-bb-users', 'ImportBbPress');
 	endif;
@@ -897,7 +878,6 @@ function gestisci_menu() {
 	}
 	
 	
-	
 	/*version check*/
    $sendit_db_version = SENDIT_DB_VERSION;
    $installed_version = get_option('sendit_db_version');
@@ -906,10 +886,9 @@ function gestisci_menu() {
    	 add_submenu_page(__FILE__, __('Upgrade Sendit', 'sendit'), __('Sendit upgrade', 'sendit'), 8, 'update-sendit', 'sendit_install');
    }
    
-   
-       
-
 }
+
+
 
 function sendit_test_email() {
 
@@ -942,15 +921,12 @@ function sendit_test_email() {
             "Content-Type: text/html; charset=\"" .
     get_option('blog_charset') . "\"\n";
    // $phpmailer->SMTPDebug = 2;  
+
     if($_GET['test_send']==1):
         $inviata=wp_mail($_GET['test_email'], 'Sendit '.SENDIT_VERSION.' test email: '.get_bloginfo('name'),'testing smtp', $headers);
         $markup.='<div id="message" class="updated fade"><p><strong>'.__('Email Test Sent!', 'sendit').'</strong></p></div>';
-
     endif;
     
-    //var_dump($phpmailer);
-    //var_dump($inviata);
-
     $markup.='<h3>Enviroment Settings</h3>';
 	$markup.='<ul>';
 	$markup.='<li>'.__('SMTP host').': <strong>'.get_option('sendit_smtp_host').'</strong></li>';
@@ -973,6 +949,55 @@ function sendit_test_email() {
     echo $markup;
 
 }
+
+
+function subscriber_columns()
+{
+     /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     	retrieve columns based on fields
+     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	 	$columns='';
+        $sendit_morefields=get_option('sendit_dynamic_settings');
+        $fields = json_decode($sendit_morefields);
+		if(!empty($fields)):
+	        foreach ($fields as $k => $v):
+	         $columns.='<th>'.$v->name.'</th>';
+	        endforeach; 	
+		endif;
+		return $columns;
+}
+
+function subscriber_columns_values($json)
+{
+     /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     	custom fields loop and form input auto generation
+     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	 	$valori=json_decode($json);
+
+	 	$columns='';
+        $sendit_morefields=get_option('sendit_dynamic_settings');
+
+        $fields = json_decode($sendit_morefields);
+if(!empty($fields)):
+        foreach ($fields as $k => $v):
+			$columns.= '<td class="">';
+			$info_string= $valori->options;
+			$explodes=explode("&", $info_string);         
+				foreach($explodes as $explode):
+					$chiave=explode("=", $explode);
+
+						if($chiave[0]==$v->name):
+				 			$columns.=$chiave[1];
+				 		endif;	
+				 		
+				endforeach;
+			$columns.= '</td>';
+        endforeach; 	
+endif;
+		return $columns;	
+
+}
+
 
 function subscriber_options($json)
 {
@@ -1064,8 +1089,13 @@ $pro_plugins = array(
         			  '5'
         			  ),
 
-
-
+        		array('Sendit Pro Woocommerce importer',
+        			  'sendit-woocommerce-import/sendit-woocommerce-import.php',
+        			  'http://sendit.wordpressplanet.org/plugin-shop/sendit-pro-woocommerce-importer/?panel_from_domain='.$siteurl,
+        			  'Track your newsletter campaign by tracking visitors from newsletter with Google Analytics Integration',
+        			  $file_dir.'images/scheduler-90x90.jpg',
+        			  '5'
+        			  ),
 
         		array('Sendit Pro Analytics Campaign tracker',
         			  'sendit-pro-analytics-campaign/sendit-pro-analytics-campaign.php',

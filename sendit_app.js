@@ -1,37 +1,54 @@
-    jQuery(document).ready(function(){
-		jQuery('.rm_options').slideUp();
-		// place meta box before standard post edit field
+jQuery(document).ready(function(){
+	//datatable
+	jQuery('#subscribers-table').DataTable();
+	jQuery('#lists').DataTable();
 
+	jQuery('#email_all').click(function(){
+	    jQuery('input:checkbox').each(function(){
+	        jQuery(this).prop('checked',true);
+	   })               
+	});
+
+jQuery('#email_none').click(function(){
+    jQuery('input:checkbox').each(function(){
+        jQuery(this).prop('checked',false);
+   })               
+});
+
+
+jQuery('.rm_options').slideUp();
+// place meta box before standard post edit field
+
+
+jQuery('#template_choice').insertBefore('#titlewrap');
     
-        jQuery('#template_choice').insertBefore('#titlewrap');
- 	    
 
- 	    jQuery(".scroll").click(function(event){		
-	    event.preventDefault();
-	    jQuery('html,body').animate({scrollTop:jQuery(this.hash).offset().top}, 500);
-	    });
+jQuery(".scroll").click(function(event){		
+	event.preventDefault();
+	jQuery('html,body').animate({scrollTop:jQuery(this.hash).offset().top}, 500);
+});
 	
 	
 	
 		
-		jQuery('.rm_section h3').click(function(){		
-			if(jQuery(this).parent().next('.rm_options').css('display')=='none')
-				{	jQuery(this).removeClass('inactive');
-					jQuery(this).addClass('active');
-					jQuery(this).children('img').removeClass('inactive');
-					jQuery(this).children('img').addClass('active');
-					
-				}
-			else
-				{	jQuery(this).removeClass('active');
-					jQuery(this).addClass('inactive');		
-					jQuery(this).children('img').removeClass('active');			
-					jQuery(this).children('img').addClass('inactive');
-				}
-				
-			jQuery(this).parent().next('.rm_options').slideToggle('slow');	
+jQuery('.rm_section h3').click(function(){		
+	if(jQuery(this).parent().next('.rm_options').css('display')=='none')
+		{	jQuery(this).removeClass('inactive');
+			jQuery(this).addClass('active');
+			jQuery(this).children('img').removeClass('inactive');
+			jQuery(this).children('img').addClass('active');
 			
-		});
+		}
+	else
+		{	jQuery(this).removeClass('active');
+			jQuery(this).addClass('inactive');		
+			jQuery(this).children('img').removeClass('active');			
+			jQuery(this).children('img').addClass('inactive');
+		}
+		
+	jQuery(this).parent().next('.rm_options').slideToggle('slow');	
+	
+});
 });
 
 jQuery(document).ready(function($) {        
@@ -55,35 +72,4 @@ jQuery(document).ready(function($) {
     }); 
 
       });
-      
-      $(".editable").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
-      type : "text",
-      submit    : "OK",
-      name : "email",
-		  cancel    : "<?php echo __('cancel','sendit'); ?>",
-		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
-      }
-      );
-      
-      
-      $(".edit_select").editable("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", {
-      type : "select",
-      data   : "{'n':'<?php echo __('not confirmed','sendit'); ?>','y':'<?php echo __('confirmed','sendit'); ?>','d':'<?php echo __('delete','sendit'); ?>'}",
-      submit    : "OK",
-      name : "accepted",
-		  cancel    : "<?php echo __('cancel','sendit'); ?>",
-		  tooltip   : "<?php echo __('Click to edit','sendit'); ?>"
-      }
-      );
-              
-         /* todo!!!
-         $(".buttonsend").click(function(){
-          $.post("<?php bloginfo( 'wpurl' ); ?>/wp-content/plugins/sendit/ajax.php", { name: "John", time: "2pm" },
-				function(data) {
-			 alert("Data Loaded: " + data);
-				});
-			 });
-			 */
-              
-              
- });
+});

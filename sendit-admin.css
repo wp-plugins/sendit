@@ -25,6 +25,10 @@
 .sendit_box_template{
     background: #fff url("images/template.png") no-repeat scroll 50% 0;
 }
+.sendit_box_woocommerce{
+    background: #fff url("images/woocommerce_logo.png") no-repeat scroll 50% 0;
+}
+
 
 
 .sendit_box_menu{

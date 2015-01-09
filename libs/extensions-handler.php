@@ -258,6 +258,20 @@ function send_newsletter($post_ID)
 }
 
 
+/* Premium Plugin screenshots */
+
+function sendit_woocommerce_screen()
+{ ?>
+	<div class="wrap">
+
+	<h2><?php echo __('To import your Woocommerce customer into Sendit you need to buy Sendit pro Woocommerce importer','sendit');?></h2>
+		<p><?php echo __('With Sendit pro Woocommerce importer (available now for only 5 euros) you will be able to import your Woocommerce customers and orders and build mailing lists. Sendit can also send products post_type with thumbnails!','sendit'); ?></p>
+			<div class="sendit_box_woocommerce sendit_box_menu"><h2><?php __('Woocommerce user?', 'sendit'); ?></h2>
+		  	<a href="http://sendit.wordpressplanet.org/plugin-shop/wordpress-plugin/sendit-pro-csv-list-exporter" class="button-primary"><?php echo __('Import your customer into Sendit', 'sendit'); ?></a>
+		  </div>	
+	</div>
+<?php }
+
 
 function export_subscribers_screen()
 { ?>

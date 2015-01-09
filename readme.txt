@@ -3,8 +3,8 @@ Contributors: Giuseppe Surace
 Donate link: http://www.giuseppesurace.com/wordpress/
 Tags: newsletter, mailing list, mailinglist, subscription form
 Requires at least: 3.0.1
-Tested up to: 3.9.1
-Stable tag: 2.3.6
+Tested up to: 4.1
+Stable tag: 2.3.7
 
 Sendit is a friendly and easy newsletter and mailing lists plugin for Wordpress, born to make newsletter delivery management a great experience.
 
@@ -28,14 +28,14 @@ Checkout [Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wor
 * Sendit Pro Css Inliner
 * Sendit Pro Csv Export
 * Sendit Pro Google analytics campaign tracker
-* Sendit Pro Splitter - Lists segmentation tool (new)
-* Sendit Pro Woocommerce importer (new)
+* Sendit Pro Woocommerce importer (new from 2.3.7)
 
 = Changelog =
+* 2.3.7 Fixes some errors editable subscribers table, datatable to manage and search subscribers and list segmentation tool
 * 2.3.6 Spinner added to send to editor
 * 2.3.5 Global refactoring for send_to_editor in tinymce (ajax powered) and general fixes (Thanks to Lorenzo)
 * 2.3.4 add column list_parent for segmentation plugins
-* 2.3.3 Ajax improvements and Woocommerce import setup
+* 2.3.3 Ajax improvements and Woocommerce customers email import setup
 * 2.3.2 Swedish language addes (Thanks to Fuad Sabanovic) and notices box fixed
 * 2.3.1 Admin buttons css fixes
 * 2.3.0 Admin css improvements
@@ -48,7 +48,7 @@ Checkout [Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wor
 
 [Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress Newsletter Plugin")
  
-Version 2 is completely rebuilt based on custom post type. It gives you the chance to send more than 1 post selected from the custom post type panel newsletter, using pro version allows you to send professional newsletter scheduled and with wonderful responsive and customizable templates.
+Version 2 is completely rebuilt based on custom post type. It gives you the chance to send more than 1 post selected from the custom post type panel newsletter, using pro version allows you to send professional newsletter scheduled and with wonderful responsive and customizable templates. If you are a Woocommerce user it's possible to include also your products in your newsletter.
 
 
 All other information (general, changelog, installation, upgrade, usage) you need about this plugin can be found here: [Sendit readme](http://sendit.wordpressplanet.org/knowledges-base/ "Sendit Readme").
@@ -57,7 +57,7 @@ All other information (general, changelog, installation, upgrade, usage) you nee
 == Development Blog ==
 
 [Giuseppe Surace Plugin author blog](http://www.giuseppesurace.com "Italian Wp designer and plugin developer")
-[Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress Plugin")
+[Sendit Official Website](http://sendit.wordpressplanet.org "Sendit Wordpress newsletter Plugin")
 
 
 == Installation ==
